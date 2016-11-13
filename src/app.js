@@ -6,7 +6,7 @@ var pg = require('pg');
 var app = express();
 var config = {
 	user: 'postgres',
-	database: 'Sharit',
+	database: 'sharit',
 	password: 'root',
 	host: 'localhost',
 	port: 5432,
