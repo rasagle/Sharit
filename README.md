@@ -62,7 +62,11 @@ sudo service postgresql restart
 ```
 
 ### Running NodeJS
-Browse to /Sharit/src and type the following command:
+Browse to /Sharit/src and get all npm dependencies:
+```javascript
+sudo npm install
+```
+Run the server directly by the following command:
 ```javascript
 node app.js
 ```
