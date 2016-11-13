@@ -13,7 +13,7 @@ var config = {
 	max: 100,
 	idleTimeoutMillis: 30000
 }
-var connect = "postgres://postgres:root@localhost/Sharit";
+var connect = "postgres://postgres:root@localhost/sharit";
 
 var pool = new pg.Pool(config);
 
