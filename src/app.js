@@ -1,54 +1,45 @@
-var express = require('express');
+var express  = require('express');
 var path = require('path');
+var morgan = require('morgan');
+var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var pg = require('pg');
-
-var app = express();
-var config = {
-	user: 'postgres',
-	database: 'sharit',
-	password: 'root',
-	host: 'localhost',
-	port: 5432,
-	max: 100,
-	idleTimeoutMillis: 30000
-}
-
-var pool = new pg.Pool(config);
-
-//settting static files
-var staticPath = path.join(__dirname, 'public');
-app.use(express.static(staticPath));
-
-//use body-parser
-app.use(bodyParser.urlencoded({extended: false}));
-
-//setting view engine
-app.set('view engine', 'ejs');
-
+var passport = require('passport');
+var session = require('express-session');
+var flash = require('connect-flash');
 var port = process.env.PORT || 3000;
+var app = express();
 
-//requiring routes
-var api = require('./routes.js');
-
-app.get('/', function(req, res){
-	pool.connect(function(err, client, done){
-		if(err)
-			return res.send('You goofed');
-		client.query('SELECT * FROM users.user', function(err, result){
-			if(err)
-				return res.send('query error');
-			done();
-			console.log(result);
-			res.render('index.ejs');
-		});
+// Database Config
+var configDB = require('./config/database.js');
+var pool = new pg.Pool(configDB);
+pool.connect(function(err, client, done) {
+	if (err) console.log('Failed to connect to database');
+	client.query('SELECT * FROM users.user', function(err, res) {
+		if (err) console.log('Query error');
+		done();
+		console.log(res);
 	});
-
 });
 
-app.get('/*', function(req, res){
-	res.render('index.ejs');
-});
+// Express Config
+app.set('view engine', 'ejs');
+app.use(morgan('dev'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+// Passport Config
+require('./config/passport')(passport); // pass passport for configuration
+app.use(session({secret: 'cat', saveUninitialized: true, resave: true}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
+// Routes Config
+require('./routes/routes.js')(app, passport);
 
 app.listen(port, function(){
 	console.log('Listening to port', port);
