@@ -2,6 +2,7 @@ var pg = require('pg');
 var conString = "postgres://sharit@localhost/";
 var client = new pg.Client(conString);
 client.connect();
+salt = 'cat' // whatever the salt is
 
 module.exports = function(app) {
 	
@@ -21,26 +22,26 @@ module.exports = function(app) {
     });
 	
 	// process the login form
-	app.post('/login', function(req, res) { {
+	app.post('/login', function(req, res) {
 		// login logic-db goes here; 
 		// 1) search if username + password combination is correct
 		
-		client.query("SELECT user.email, user.password " + "FROM users " + "WHERE user.email=$1 AND user.pass=$2", [req.email, req.password])
+		client.query("SELECT email, password " + "FROM users " + "WHERE user.email=$1 AND user.pass=$2", [req.email, hash(req.password]))
 		.then((result)=> {
-			return done(null, result);
+			if (result.rows.length == 1)
+				res.render('profile.ejs');
 		})
 		.catch((err) => {
-			log.error("/login: " + err);
-			return done(null, false, {message:'Wrong email or password'});
+			console.log('Query error');
+			res.send('Wrong email or password');
 		});
-	}));
+	});
 	
 	// =====================================
     // SIGNUP ==============================
     // =====================================
     // show the signup form
 	app.get('/signup', function(req, res) {
-        // render the page and pass in any flash data if it exists
         res.render('signup.ejs');
     });
 	
@@ -50,17 +51,24 @@ module.exports = function(app) {
 		// 1) search if user/email exists
 		// 2) insert into DB if new user
 		
-		client.query('SELECT $1 FROM users.email', [req.email], function(err, res) {
-			if (err) {
-				console.log('Query error'); // proceed to sign up
+		client.query('SELECT username, email FROM users.user WHERE username = $1 and email = $2', [req.username, req.email]) // check if username + email exists
+		.then((result) => {
+			if (result.rows.length == 0) { // if none exists, signup available
+				client.query('INSERT INTO users.user VALUES($1, $2, $3, $4, $5, $6, $7', [req.username, salt, hash(req.password), req.firstname, req.lastname, req.email, req.org]) // signup
+				.then((result) => {
+					res.render('profile.ejs'); // redirect whatever successful signup is
+				})
+				.catch((err) => {
+					console.log('Query Error');
+				});
 			}
-			else if (res.rows.length == 0) { // email does not exist; is available to signup
-				client.query('INSERT INTO users(email, username, password) VALUES($1, $2)', [req.email, req.username, req.password], function (err, res) {
-			}
-			done();
-			console.log(res);
+			else
+				res.send("Email is taken");
+		})
+		.catch((err) => {
+			console.log("Query error");
 		});
-    }));
+	});
 
 	// =====================================
     // PROFILE SECTION =====================
@@ -91,13 +99,5 @@ module.exports = function(app) {
 		// if they aren't redirect them to the home page
 		res.redirect('/');
 	}
-	
-	// app.get('/logout', function(req, res){
-		// var name = req.user.username;
-		// console.log("LOGGED OUT " + req.user.username)
-		// req.logout();
-		// res.redirect('/');
-		// req.session.notice = "You have successfully been logged out " + name + "!";
-	// });
 	
 };

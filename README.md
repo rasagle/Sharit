@@ -13,8 +13,9 @@ Sharit is a website developed to share information between users of established 
 * HTML5
 * CSS3
 
-## Usuage
-User will sign in (sign up if haven't done so), look for a thread, and comment on a thread. Users could also create a thread and upvote or downvote other user's comments.
+## Usage
+User will sign in (sign up if haven't done so), look for a thread, and comment on a thread. Users could also create a thread and upvote or downvote other user's comments. 
+Files will be shared through threads.
 
 ## How to Install and Run
 ### Installing NodeJS
