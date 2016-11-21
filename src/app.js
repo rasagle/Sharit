@@ -4,9 +4,6 @@ var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var pg = require('pg');
-var passport = require('passport');
-var session = require('express-session');
-var flash = require('connect-flash');
 var port = process.env.PORT || 3000;
 var app = express();
 
@@ -30,16 +27,8 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
-// Passport Config
-require('./config/passport')(passport); // pass passport for configuration
-app.use(session({secret: 'cat', saveUninitialized: true, resave: true}));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
-
 // Routes Config
-require('./routes/routes.js')(app, passport);
+require('./routes/routes.js')(app);
 
 app.listen(port, function(){
 	console.log('Listening to port', port);

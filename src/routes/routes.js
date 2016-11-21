@@ -1,4 +1,9 @@
-module.exports = function(app, passport) {
+var pg = require('pg');
+var conString = "postgres://sharit@localhost/";
+var client = new pg.Client(conString);
+client.connect();
+
+module.exports = function(app) {
 	
 	// =====================================
 	// HOME PAGE (with login links) ========
@@ -12,15 +17,22 @@ module.exports = function(app, passport) {
 	// =====================================
 	// show the login form
 	app.get('/login', function(req, res) {
-		// render the page and pass in any flash data if it exists
-       res.render('login.ejs', { message: req.flash('loginMessage') }); 
+       res.render('login.ejs'); 
     });
 	
 	// process the login form
-	app.post('/login', passport.authenticate('local-login', {
-		successRedirect: '/profile', // redirect to the secure profile section
-		failureRedirect: '/login', // redirect back to the signup page if there is an error
-		failureFlash : true 
+	app.post('/login', function(req, res) { {
+		// login logic-db goes here; 
+		// 1) search if username + password combination is correct
+		
+		client.query("SELECT user.email, user.password " + "FROM users " + "WHERE user.email=$1 AND user.pass=$2", [req.email, req.password])
+		.then((result)=> {
+			return done(null, result);
+		})
+		.catch((err) => {
+			log.error("/login: " + err);
+			return done(null, false, {message:'Wrong email or password'});
+		});
 	}));
 	
 	// =====================================
@@ -29,14 +41,25 @@ module.exports = function(app, passport) {
     // show the signup form
 	app.get('/signup', function(req, res) {
         // render the page and pass in any flash data if it exists
-        res.render('signup.ejs', { message: req.flash('signupMessage') });
+        res.render('signup.ejs');
     });
 	
 	// process the signup form
-    app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect : '/profile', // redirect to the secure profile section
-        failureRedirect : '/signup', // redirect back to the signup page if there is an error
-        failureFlash : true // allow flash messages
+    app.post('/signup', function(req, res) {
+		// signup logic-db goes here; 
+		// 1) search if user/email exists
+		// 2) insert into DB if new user
+		
+		client.query('SELECT $1 FROM users.email', [req.email], function(err, res) {
+			if (err) {
+				console.log('Query error'); // proceed to sign up
+			}
+			else if (res.rows.length == 0) { // email does not exist; is available to signup
+				client.query('INSERT INTO users(email, username, password) VALUES($1, $2)', [req.email, req.username, req.password], function (err, res) {
+			}
+			done();
+			console.log(res);
+		});
     }));
 
 	// =====================================
@@ -45,9 +68,7 @@ module.exports = function(app, passport) {
     // we will want this protected so you have to be logged in to visit
     // we will use route middleware to verify this (the isLoggedIn function)
     app.get('/profile', isLoggedIn, function(req, res) {
-        res.render('profile.ejs', {
-            user : req.user // get the user out of session and pass to template
-        });
+        res.render('profile.ejs', { user : req.user });
         console.log(req.user);
     });
 
