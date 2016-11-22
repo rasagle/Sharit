@@ -30,6 +30,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Routes Config
 require('./routes/routes.js')(app);
 
+app.get('/', function(req, res){
+	res.render('index.ejs');
+});
+
 app.listen(port, function(){
 	console.log('Listening to port', port);
 });
