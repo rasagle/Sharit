@@ -12,7 +12,7 @@ var client = new pg.Pool(configDB);
 
 
 // process the login form
-app.post('/login', function(req, res) {
+router.post('/login', function(req, res) {
 	// login logic-db goes here; 
 	// 1) search if username + password combination is correct
 	client.query("SELECT email, password " + "FROM users " + "WHERE user.email=$1 AND user.pass=$2", [req.email, hash(req.password]))
@@ -32,7 +32,7 @@ app.post('/login', function(req, res) {
 // =====================================
 // show the signup form
 // process the signup form
-app.post('/signup', function(req, res) {
+router.post('/signup', function(req, res) {
 	// signup logic-db goes here; 
 	// 1) search if user/email exists
 	// 2) insert into DB if new user	
@@ -61,7 +61,7 @@ app.post('/signup', function(req, res) {
 // =====================================
 // we will want this protected so you have to be logged in to visit
 // we will use route middleware to verify this (the isLoggedIn function)
-app.get('/profile', isLoggedIn, function(req, res) {
+router.get('/profile', isLoggedIn, function(req, res) {
     res.render('profile.ejs', { user : req.user });
     console.log(req.user);
     
