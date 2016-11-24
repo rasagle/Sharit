@@ -57,7 +57,7 @@ sudo -u postgres psql
 ```
 Restore sharit.backup database into initial empty sharit we created earlier (watch for path):
 ```javascript
-sudo pg_restore --host 'localhost' --port 5432 --username "postgres" --dbname "Sharit" --clean "/home/ubuntu/GitHub/Sharit/sharit.backup"
+sudo pg_restore --host 'localhost' --port 5432 --username "postgres" --dbname "sharit" --clean "/home/ubuntu/GitHub/Sharit/databaseFiles/sharit.backup"
 ```
 The PostgreSQL should be running, but if it is not or unexpectedly dies, PostgreSQL service can be restarted:
 ```javascript
@@ -71,7 +71,7 @@ sudo npm install
 ```
 Run the server directly by the following command:
 ```javascript
-node app.js
+node bin/www
 ```
 The server can be automatically restarted upon crash with a production manager module, pm2. Install pm2 by:
 ```javascript
