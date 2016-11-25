@@ -3,6 +3,8 @@ Sharit Website
 
 http://ec2-52-91-21-93.compute-1.amazonaws.com:3000/
 
+*Updated 11/25/2016*
+
 ## Overview
 Sharit is a website developed to share information between users of established organizations. Main features supported are file sharing with threads, comments for users to communicate with one another. This website is built on NodeJS for front and back end, postgreSQL for db, and React.js + bootstrapping for frontend responsiveness.
 
@@ -89,4 +91,4 @@ sudo -u postgres psql
 \q \\ quit
 \c 'database_name' \\ use this database
 'SQL'; \\ perform the SQL.
-SELECT * FROM users.user; \\ show members' id, pass(hashed), etc.
+SELECT * FROM users.user; \\ show members id, pass(hashed), etc.
