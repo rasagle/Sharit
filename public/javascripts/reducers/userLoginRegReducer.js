@@ -1,7 +1,8 @@
 import {browserHistory} from 'react-router';
 const info = {
 	loggedIn: false,
-	registered: false
+	registered: false,
+	username: ""
 }
 
 export default function reducer(state = info, action){
@@ -9,7 +10,7 @@ export default function reducer(state = info, action){
 	switch(action.type){
 		case "LOGIN_SUCCESS":
 			browserHistory.push('/');
-			return {...state, loggedIn: true};
+			return {...state, loggedIn: true, username: action.payload};
 			break;
 		case "LOGIN_FAIL":
 			return {...state};

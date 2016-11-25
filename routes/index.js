@@ -18,7 +18,7 @@ router.post('/register', function(req, res){
 	pool.connect(function(err, client, done){
 		var queryFind = 'SELECT username FROM users.user WHERE username=$1';
 		var queryInsert = 'INSERT INTO users.user(username, hash, first_name, last_name, email, phone, company, salt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING username';
-
+		var domainInsert = 'INSERT INTO permissions.domain_user VALUES($1, $2, $3)';
 		client.query(queryFind, [username], function(err, result){
 			if(err){
 				console.log('Error running query', err);
@@ -32,7 +32,13 @@ router.post('/register', function(req, res){
 						res.send('');
 					}
 					console.log(result.rows);
-					return res.json(result.rows[0]);
+
+					client.query(domainInsert, [1, username, false], function(err, result){
+						if(err) console.log('Error running query', err);
+						done();
+						res.json(result.rows[0]);
+					});
+
 				});
 			}else{
 				done();
@@ -70,6 +76,17 @@ router.post('/login', function(req, res){
 				res.send('');
 			}
 			done();
+		});
+	});
+});
+
+router.post('/getDomain', function(req, res){
+	var findDomains = 'SELECT name from permissions.domain_user NATURAL JOIN domains.domain WHERE username = $1';
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(findDomains, [req.body.username], function(err, result){
+			console.log(result.rows);
+			res.json(result.rows);
 		});
 	});
 });

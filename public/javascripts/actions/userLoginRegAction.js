@@ -8,7 +8,17 @@ export function login(username, password){
 			password,
 		})
 		.then(res =>{
-			if(res.data != '') dispatch({type: 'LOGIN_SUCCESS', payload: res.data});
+			if(res.data != ''){
+				 dispatch({type: 'LOGIN_SUCCESS', payload: res.data.username});
+				 
+				 axios.post('/getDomain', {username})
+					.then(res =>{
+						dispatch({type: "DOMAIN_RETREIVED", username, payload: res.data});
+					})
+					.catch(err =>{
+						dispatch({type: "DOMAIN_FAILED"});
+					});
+			}
 			else dispatch({type: 'LOGIN_FAIL'});
 		})
 		.catch(err =>{
@@ -21,7 +31,7 @@ export function register(data){
 	return dispatch =>{
 		axios.post('/register', data)
 		.then(res =>{
-			if(res != '') dispatch({type: 'REGISTER_SUCCESS', payload: res.data});
+			if(res.data != '') dispatch({type: 'REGISTER_SUCCESS', payload: res.data});
 			else dispatch({type: 'REGISTER_FAIL'});
 		})
 		.catch(err =>{

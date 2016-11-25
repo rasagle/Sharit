@@ -27,7 +27,6 @@ class Register extends React.Component{
 	onSubmit(e){
 		e.preventDefault();
 		const {username, password, first_name, last_name, email, phone, company} = this.state;
-		//this.props.register(username, password, first_name, last_name, email, phone, company);
 		this.props.register(this.state);
 		console.log(this.state);
 	}

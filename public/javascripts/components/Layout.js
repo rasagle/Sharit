@@ -6,10 +6,17 @@ import {bindActionCreators} from 'redux';
 import {Router, Route, IndexRoute, browserHistory} from "react-router";
 
 import {login, register} from '../actions/userLoginRegAction';
+import {getDomain} from '../actions/domainAction';
 import Login from './Login';
 import Register from './Register';
+import Nav from './Nav';
 
 class Layout extends React.Component{
+	constructor(props){
+		super(props);
+		
+	}
+
 	render(){
 		if(this.props.logged){
 			return(
@@ -17,7 +24,9 @@ class Layout extends React.Component{
 					<div class="container"> 
 						<div class="row">
 							<div class="col-lg-12">
+								<Nav user={this.props.user} domain={this.props.domain}/><br></br>	
 								<h1>Sharit</h1>
+								<h1>{this.props.user}</h1>
 							</div>
 						</div>
 					</div>
@@ -35,13 +44,14 @@ class Layout extends React.Component{
 
 function mapStateToProps(state){
 	return{
-		user: state.user.user,
-		logged: state.user.loggedIn
+		user: state.user.username,
+		logged: state.user.loggedIn,
+		domain : state.domain.domain,
 	}
 }
 
 function matchDispatchToProps(dispatch){
-	return bindActionCreators({login, register}, dispatch);
+	return bindActionCreators({login, register, getDomain}, dispatch);
 }
 
 export default connect(mapStateToProps, matchDispatchToProps)(Layout);
