@@ -1,4 +1,5 @@
 import axios from "axios";
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 export function login(username, password){
 	return dispatch =>{
@@ -16,17 +17,9 @@ export function login(username, password){
 	};
 }
 
-export function register(username, hash, first_name, last_name, email, phone, company){
+export function register(data){
 	return dispatch =>{
-		axios.post('/register', {
-			username,
-			hash,
-			first_name,
-			last_name,
-			email,
-			phone,
-			company,
-		})
+		axios.post('/register', data)
 		.then(res =>{
 			if(res != '') dispatch({type: 'REGISTER_SUCCESS', payload: res.data});
 			else dispatch({type: 'REGISTER_FAIL'});

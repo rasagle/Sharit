@@ -30,16 +30,20 @@ class Login extends React.Component{
 	render(){
 		return(
 			<div class="container">
-				<div class="jumbotron">
-					<form onSubmit={this.onSubmit}>
-						<div class="form-group">
-							<label for="username">Username</label>
-						    <input type="text" name="username" class="form-control" onChange={this.onChange}/>
-						    <label for="password">Password</label>
-						    <input type="password" name="password" class="form-control" onChange={this.onChange}/>
-						    <input type="submit" class="btn btn-primary" value="Login" />
+				<div class="row">
+					<div class="col-md-4 col-md-offset-4">
+						<div class="jumbotron">
+							<form onSubmit={this.onSubmit}>
+								<div class="form-group">
+									<label for="username">Username</label>
+								    <input type="text" name="username" class="form-control" onChange={this.onChange} required/>
+								    <label for="password">Password</label>
+								    <input type="password" name="password" class="form-control" onChange={this.onChange} required/><br></br>
+								    <input type="submit" class="btn btn-primary" value="Login" />
+								</div>
+							</form>
 						</div>
-					</form>
+					</div>
 				</div>
 			</div>
 		);
@@ -48,7 +52,6 @@ class Login extends React.Component{
 
 function mapStateToProps(state){
 	return{
-		user: state.user.user,
 		logged: state.user.loggedIn
 	}
 }

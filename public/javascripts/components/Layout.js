@@ -17,7 +17,7 @@ class Layout extends React.Component{
 					<div class="container"> 
 						<div class="row">
 							<div class="col-lg-12">
-								{this.props.children}
+								<h1>Sharit</h1>
 							</div>
 						</div>
 					</div>
@@ -27,7 +27,6 @@ class Layout extends React.Component{
 			return(
 				<div>
 					<Initial/>
-					{this.props.children}
 				</div>
 			);
 		}

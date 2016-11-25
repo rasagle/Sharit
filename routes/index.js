@@ -15,7 +15,6 @@ router.post('/register', function(req, res){
 	var salt =  bcrypt.genSaltSync(10);
 	var {username, password, first_name, last_name, email, phone, company} = req.body;
 	var hash = bcrypt.hashSync(password, salt);
-
 	pool.connect(function(err, client, done){
 		var queryFind = 'SELECT username FROM users.user WHERE username=$1';
 		var queryInsert = 'INSERT INTO users.user(username, hash, first_name, last_name, email, phone, company, salt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING username';
@@ -26,18 +25,19 @@ router.post('/register', function(req, res){
 				res.send('');
 			}
 			if(result.rows.length === 0){
-				client.query(queryInsert, [username, password, first_name, last_name, email, phone, company, salt], function(err, result){
+				client.query(queryInsert, [username, hash, first_name, last_name, email, phone, company, salt], function(err, result){
 					done();
 					if(err){
 						console.log('Error running query', err);
 						res.send('');
 					}
 					console.log(result.rows);
-					res.json(result.rows[0]);
+					return res.json(result.rows[0]);
 				});
+			}else{
+				done();
+				res.send('');
 			}
-			done();
-			res.send('');
 		});
 	});
 });
@@ -57,15 +57,19 @@ router.post('/login', function(req, res){
 				res.send('');
 			}
 			if(result.rows.length !== 0){
-				client.query(validLogin, [req.body.username, req.body.password], function(err, result){
-					if(result.rows.length != 0)
+				var hash = bcrypt.hashSync(req.body.password, result.rows[0].salt);
+				client.query(validLogin, [req.body.username, hash], function(err, result){
+					if(result.rows.length != 0){
+						console.log(result.rows[0]);
 						res.json(result.rows[0]);
+					}
 					else
 						res.send('');
 				});
+			}else{
+				res.send('');
 			}
 			done();
-			res.send('');
 		});
 	});
 });

@@ -1,16 +1,22 @@
+/*
 .jumbotron{
 	display: inline-block;
 	text-align: center;
-	width: 300px;
-	height: 150px;
 	position: absolute;
+	width: 300px;
+	height: 20em;
 	top:0;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	margin: auto;
 }
+*/
 
+.jumbotron{
+	text-align: center;
+	display: inline-block;
+}
 .init{
 	margin: 5px;
 }
