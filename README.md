@@ -49,7 +49,7 @@ Create initial empty sharit database:
 ```javascript
 sudo psql -h 'localhost' -p 5432 -U postgres -c "CREATE DATABASE sharit"
 ```
-Verify sharit database has been created:
+Verify sharit database has been created (if anything goes wrong, can do "DROP DATABASE sharit;" on psql cli:
 ```javascript
 sudo -u postgres psql
 \l \\ show databases under user "postgres"
