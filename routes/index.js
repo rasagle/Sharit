@@ -45,6 +45,7 @@ router.post('/register', function(req, res){
 router.post('/login', function(req, res){
 	var findSalt = 'SELECT salt FROM users.user WHERE username=$1';
 	var validLogin = 'SELECT * FROM users.user WHERE username=$1 and hash=$2';
+	console.log(req.body);
 	pool.connect(function(err, client, done){
 		if(err){
 			console.log('Error running query', err);

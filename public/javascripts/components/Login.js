@@ -7,8 +7,8 @@ import {login} from '../actions/userLoginRegAction';
 class Login extends React.Component{
 	constructor(props){
 		super(props);
-		this.onChange = this.onSubmit.bind(this);
-		this.onSubmit = this.onChange.bind(this);
+		this.onChange = this.onChange.bind(this);
+		this.onSubmit = this.onSubmit.bind(this);
 		this.state={
 			username: "",
 			password: ""
@@ -20,22 +20,24 @@ class Login extends React.Component{
 	}
 
 	onSubmit(e){
+		e.preventDefault();
 		const {username, password} = this.state;
 		this.props.login(username, password);
-		browserHistory.push('/');
+		console.log(this.state);
+		//browserHistory.push('/');
 	}
 
 	render(){
 		return(
 			<div class="container">
 				<div class="jumbotron">
-					<form>
+					<form onSubmit={this.onSubmit}>
 						<div class="form-group">
 							<label for="username">Username</label>
-						    <input type="text" name="username" class="form-control" onChange={this.onChange} onSubmit={this.onSubmit}/>
+						    <input type="text" name="username" class="form-control" onChange={this.onChange}/>
 						    <label for="password">Password</label>
-						    <input type="text" name="password" class="form-control" onChange={this.onChange} onSubmit={this.onSubmit}/>
-						    <input type="submit" class="btn btn-primary" value="Login"/>
+						    <input type="password" name="password" class="form-control" onChange={this.onChange}/>
+						    <input type="submit" class="btn btn-primary" value="Login" />
 						</div>
 					</form>
 				</div>
@@ -52,7 +54,7 @@ function mapStateToProps(state){
 }
 
 function matchDispatchToProps(dispatch){
-	return bindActionCreators(login, dispatch);
+	return bindActionCreators({login}, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchToProps)(Login);
+export default connect(null, matchDispatchToProps)(Login);

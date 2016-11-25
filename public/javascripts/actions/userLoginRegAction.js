@@ -7,7 +7,7 @@ export function login(username, password){
 			password,
 		})
 		.then(res =>{
-			if(res != '') dispatch({type: 'LOGIN_SUCCESS', payload: res.data});
+			if(res.data != '') dispatch({type: 'LOGIN_SUCCESS', payload: res.data});
 			else dispatch({type: 'LOGIN_FAIL'});
 		})
 		.catch(err =>{
@@ -16,11 +16,11 @@ export function login(username, password){
 	};
 }
 
-export function register(username, password, first_name, last_name, email, phone, company){
+export function register(username, hash, first_name, last_name, email, phone, company){
 	return dispatch =>{
 		axios.post('/register', {
 			username,
-			password,
+			hash,
 			first_name,
 			last_name,
 			email,
