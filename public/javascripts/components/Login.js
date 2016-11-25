@@ -7,8 +7,8 @@ import {login} from '../actions/userLoginRegAction';
 class Login extends React.Component{
 	constructor(props){
 		super(props);
-		this.onSubmit.bind(this);
-		this.onChange.bind(this);
+		this.onChange = this.onSubmit.bind(this);
+		this.onSubmit = this.onChange.bind(this);
 		this.state={
 			username: "",
 			password: ""
@@ -29,12 +29,12 @@ class Login extends React.Component{
 		return(
 			<div class="container">
 				<div class="jumbotron">
-					<form onChange={this.onChange} onSubmit={this.onSubmit}>
+					<form>
 						<div class="form-group">
 							<label for="username">Username</label>
-						    <input type="text" name="username" class="form-control"/>
+						    <input type="text" name="username" class="form-control" onChange={this.onChange} onSubmit={this.onSubmit}/>
 						    <label for="password">Password</label>
-						    <input type="text" name="password" class="form-control"/>
+						    <input type="text" name="password" class="form-control" onChange={this.onChange} onSubmit={this.onSubmit}/>
 						    <input type="submit" class="btn btn-primary" value="Login"/>
 						</div>
 					</form>

@@ -18,7 +18,7 @@ router.post('/register', function(req, res){
 
 	pool.connect(function(err, client, done){
 		var queryFind = 'SELECT username FROM users.user WHERE username=$1';
-		var queryInsert = 'INSERT INTO users.user(username, password, first_name, last_name, email, phone, company, salt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING username';
+		var queryInsert = 'INSERT INTO users.user(username, hash, first_name, last_name, email, phone, company, salt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING username';
 
 		client.query(queryFind, [username], function(err, result){
 			if(err){
@@ -44,7 +44,7 @@ router.post('/register', function(req, res){
 
 router.post('/login', function(req, res){
 	var findSalt = 'SELECT salt FROM users.user WHERE username=$1';
-	var validLogin = 'SELECT * FROM users.user WHERE username=$1 and password=$2';
+	var validLogin = 'SELECT * FROM users.user WHERE username=$1 and hash=$2';
 	pool.connect(function(err, client, done){
 		if(err){
 			console.log('Error running query', err);
