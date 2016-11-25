@@ -13,7 +13,6 @@ router.get('/', function(req, res) {
 		client.query('SELECT * FROM users.user', function(err, result) {
 			if (err) console.log('Query error');
 			done();
-			console.log(result);
 			res.render('index');
 	});
 });
