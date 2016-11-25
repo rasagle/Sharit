@@ -6,7 +6,7 @@ var jsonBody = {
 }
 
 request({
-	url: 'http://localhost:3000/register',
+	url: 'http://localhost:3000/login',
 	method: 'post',
 	json: true,
 	body: jsonBody
