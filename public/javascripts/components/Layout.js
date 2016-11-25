@@ -24,7 +24,7 @@ class Layout extends React.Component{
 					<div class="container"> 
 						<div class="row">
 							<div class="col-lg-12">
-								<Nav user={this.props.user} domain={this.props.domain}/><br></br>	
+								<Nav user={this.props.user} domain={this.props.domain}/><br></br><br></br>
 								<h1>Sharit</h1>
 								<h1>{this.props.user}</h1>
 							</div>

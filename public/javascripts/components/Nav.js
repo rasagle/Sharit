@@ -11,21 +11,12 @@ class Nav extends React.Component {
     this.state = {
       collapsed: true,
     };
-    //this.props.domain(this.props.user);
-  }
-
-  componentDidUpdate(){
     console.log(this.props.domain);
   }
 
   toggleCollapse() {
     const collapsed = !this.state.collapsed;
     this.setState({collapsed});
-  }
-
-  getNavLinks(){
-    
-    return domName;
   }
 
   render() {
