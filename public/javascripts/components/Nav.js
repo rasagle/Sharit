@@ -11,7 +11,6 @@ class Nav extends React.Component {
     this.state = {
       collapsed: true,
     };
-    console.log(this.props.domain);
   }
 
   toggleCollapse() {
@@ -25,7 +24,7 @@ class Nav extends React.Component {
     const navClass = collapsed ? "collapse" : "";
 
     const domName = this.props.domain.map((dom)=>{
-      return <li key={dom.name}><Link to="/" onClick={this.toggleCollapse.bind(this)} activeClassName="active" >{dom.name}</Link> </li>
+      return <li key={dom.id}><Link to="/" onClick={this.toggleCollapse.bind(this)} activeClassName="active" >{dom.name}</Link> </li>
     });
 
     return (
@@ -44,7 +43,6 @@ class Nav extends React.Component {
               {domName}
               
             </ul>
-              }
           </div>
         </div>
       </nav>

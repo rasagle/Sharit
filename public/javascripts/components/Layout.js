@@ -3,10 +3,9 @@ import Initial from './InitialPage';
 import {connect} from 'react-redux';
 import {Link} from "react-router";
 import {bindActionCreators} from 'redux';
-import {Router, Route, IndexRoute, browserHistory} from "react-router";
 
 import {login, register} from '../actions/userLoginRegAction';
-import {getDomain} from '../actions/domainAction';
+import getDomain from '../actions/domainAction';
 import Login from './Login';
 import Register from './Register';
 import Nav from './Nav';
@@ -18,15 +17,17 @@ class Layout extends React.Component{
 	}
 
 	render(){
+
 		if(this.props.logged){
+			
 			return(
 				<div>
 					<div class="container"> 
 						<div class="row">
 							<div class="col-lg-12">
 								<Nav user={this.props.user} domain={this.props.domain}/><br></br><br></br>
-								<h1>Sharit</h1>
-								<h1>{this.props.user}</h1>
+								<h1>Welcome to Sharit, {this.props.user} </h1>
+								{this.props.children}
 							</div>
 						</div>
 					</div>

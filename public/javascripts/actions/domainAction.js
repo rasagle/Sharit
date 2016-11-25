@@ -3,7 +3,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 
 export function getDomain(username){
 	return dispatch =>{
-		axios.post('/getDomain', username)
+		axios.post('/getDomain', {username})
 		.then(res =>{
 			dispatch({type: "DOMAIN_RETREIVED", username, payload: res.data});
 		})

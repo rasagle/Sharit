@@ -7,6 +7,7 @@ import store from './store';
 
 import Login from './components/Login';
 import Register from './components/Register';
+import SubdomainDefault from './components/SubdomainDefault';
 
 const app = document.getElementById('app');
 
@@ -14,7 +15,8 @@ ReactDOM.render(
 <Provider store={store}>
 	<Router history={browserHistory}>
 		<Route path='/' component={Layout}>
-			
+			<IndexRoute component={SubdomainDefault}></IndexRoute>
+			<Route path="/s/:subSharit"></Route>
 		</Route>
 		<Route path="/login" component={Login}></Route>
 		<Route path="/register" component={Register}></Route>

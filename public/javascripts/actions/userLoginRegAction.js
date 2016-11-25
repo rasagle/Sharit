@@ -18,6 +18,14 @@ export function login(username, password){
 					.catch(err =>{
 						dispatch({type: "DOMAIN_FAILED"});
 					});
+
+				axios.post('/getsubDomain', {username})
+					.then(res =>{
+						dispatch({type: "SUBDOMAIN_RETREIVED", username, payload: res.data});
+					})
+					.catch(err =>{
+						dispatch({type: "SUBDOMAIN_FAILED"});
+					});
 			}
 			else dispatch({type: 'LOGIN_FAIL'});
 		})
