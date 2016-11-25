@@ -7,7 +7,8 @@ const info = {
 		phone: null,
 		company: null
 	},
-	loggedIn: false
+	loggedIn: false,
+	registered: false
 }
 
 export default function reducer(state = info, action){
@@ -22,10 +23,11 @@ export default function reducer(state = info, action){
 			return {...state};
 			break;
 		case "REGISTER_SUCCESS":
-			return {...state, user: {...state.user, username, first_name, last_name, email, phone, company,}};
+			return {...state, registered: true};
 			break;
 		case "REGISTER_FAIL":
 			return {...state};
+			break;
 	}
 	return state;
 }

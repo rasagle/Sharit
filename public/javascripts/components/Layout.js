@@ -3,8 +3,11 @@ import Initial from './InitialPage';
 import {connect} from 'react-redux';
 import {Link} from "react-router";
 import {bindActionCreators} from 'redux';
+import {Router, Route, IndexRoute, browserHistory} from "react-router";
 
 import {login, register} from '../actions/userLoginRegAction';
+import Login from './Login';
+import Register from './Register';
 
 class Layout extends React.Component{
 	render(){
@@ -21,7 +24,12 @@ class Layout extends React.Component{
 				</div>
 			);
 		}else{
-			return(<Initial/>);
+			return(
+				<div>
+					<Initial/>
+					{this.props.children}
+				</div>
+			);
 		}
 	}
 }
