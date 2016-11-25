@@ -81,3 +81,12 @@ And run with:
 ```javascript
 pm2 start app.js
 ```
+
+### Using PostgreSQL on CLI
+```javascript
+sudo -u postgres psql
+\l \\ show databases
+\q \\ quit
+\c 'database_name' \\ use this database
+'SQL'; \\ perform the SQL.
+SELECT * FROM users.user; \\ show members' id, pass(hashed), etc.

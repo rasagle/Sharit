@@ -14,3 +14,4 @@ userData = {
 
 headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 requests.post('http://localhost:3000/register', data = json.dumps(userData), headers = headers)
+
