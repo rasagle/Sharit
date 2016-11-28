@@ -115,20 +115,6 @@ router.post('/getsubDomain', function(req, res){
 	});
 });
 
-// given author, subdomain_id,
-// find thread
-router.post('/findThread', function(req, res){
-	var findThreads = 'SELECT subdomain_id, author from posts.thread WHERE subdomain_id = $1, author = $2';
-	console.log(req.body);
-	pool.connect(function(err, client, done){
-		client.query(findThreads, [req.body.subdomain_id, req.body.username], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
-		});
-	});
-});
-
 // given sudomain_id, author, date_posted, comment, points, stickied or not,
 // create thread
 // note: "comment" in this sense is context, the body of the thread OP
@@ -144,14 +130,41 @@ router.post('/createThread', function(req, res){
 	});
 });
 
+// given subdomain_id,
+// get every detail from thread
+router.post('/getThread', function(req, res){
+	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1';
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(findThreads, [req.body.subdomain_id], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
 // given thread_id, comment_id, author, current_timestamp, comment, points,
 // create comment
-
 router.post('/createComment', function(req, res){
 	var createComment = 'INSERT into posts.comment(thread_id, comment_id, author, current_timestamp, comment, points) values($1, $2, $3, $4, $5, $6)';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(createComment, [req.body.thread_id, req.body.comment_id, req.body.author, req.body.current_timestamp, req.body.comment, req.body.points], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
+// given thread_id, 
+// get all comments info from given thread_id in a subdomain
+router.post('/findComment', function(req, res){
+	var findComments = 'SELECT * from posts.comment NATURAL JOIN posts.thread WHERE subdomain_id = $2'
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(findComments, [req.body.subdomain_id], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
