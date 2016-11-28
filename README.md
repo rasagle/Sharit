@@ -1,7 +1,6 @@
 # Project Sharit
 Sharit Website
 
-http://ec2-52-91-21-93.compute-1.amazonaws.com:3000/
 
 *Updated 11/25/2016*
 
