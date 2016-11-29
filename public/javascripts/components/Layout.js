@@ -9,6 +9,7 @@ import getDomain from '../actions/domainAction';
 import Login from './Login';
 import Register from './Register';
 import Nav from './Nav';
+import SubNav from './SubdomainDefault';
 
 class Layout extends React.Component{
 	constructor(props){
@@ -27,7 +28,7 @@ class Layout extends React.Component{
 							<div class="col-lg-12">
 								<Nav user={this.props.user} domain={this.props.domain}/><br></br><br></br>
 								<h1>Welcome to Sharit, {this.props.user} </h1>
-								{this.props.children}
+								<SubNav/>
 							</div>
 						</div>
 					</div>

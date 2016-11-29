@@ -16,7 +16,7 @@ ReactDOM.render(
 	<Router history={browserHistory}>
 		<Route path='/' component={Layout}>
 			<IndexRoute component={SubdomainDefault}></IndexRoute>
-			<Route path="/s/:subSharit"></Route>
+			<Route path="/:domain/:subSharit"></Route>
 		</Route>
 		<Route path="/login" component={Login}></Route>
 		<Route path="/register" component={Register}></Route>
