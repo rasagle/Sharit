@@ -115,14 +115,11 @@ router.post('/getsubDomain', function(req, res){
 	});
 });
 
-// given sudomain_id, author, date_posted, comment, points, stickied or not,
-// create thread
-// note: "comment" in this sense is context, the body of the thread OP
 router.post('/createThread', function(req, res){
-	var createThread = 'INSERT INTO posts.thread(subdomain_id, author, date_posted, comment, points, stickied) VALUES($1, $2, $3, $4, $5, $6)';
+	var createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
-		client.query(createThread, [req.body.subdomain_id, req.body.author, req.body.date_posted, req.body.comment, req.body.points, req.body.sticked], function(err, result){
+		client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
@@ -130,8 +127,6 @@ router.post('/createThread', function(req, res){
 	});
 });
 
-// given subdomain_id,
-// get every detail from thread
 router.post('/getThread', function(req, res){
 	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1';
 	console.log(req.body);
@@ -144,13 +139,11 @@ router.post('/getThread', function(req, res){
 	});
 });
 
-// given thread_id, comment_id, author, current_timestamp, comment, points,
-// create comment
 router.post('/createComment', function(req, res){
-	var createComment = 'INSERT into posts.comment(thread_id, comment_id, author, current_timestamp, comment, points) values($1, $2, $3, $4, $5, $6)';
+	var createComment = 'INSERT into posts.comment(thread_id, author, comment) values($1, $2, $3)';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
-		client.query(createComment, [req.body.thread_id, req.body.comment_id, req.body.author, req.body.current_timestamp, req.body.comment, req.body.points], function(err, result){
+		client.query(createComment, [req.body.thread_id, req.body.author, req.body.comment], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
@@ -158,13 +151,35 @@ router.post('/createComment', function(req, res){
 	});
 });
 
-// given thread_id, 
-// get all comments info from given thread_id in a subdomain
 router.post('/findComment', function(req, res){
-	var findComments = 'SELECT * from posts.comment NATURAL JOIN posts.thread WHERE subdomain_id = $2'
+	var findComments = 'SELECT * from posts.comment JOIN posts.thread WHERE thread_id = $1'
 	console.log(req.body);
 	pool.connect(function(err, client, done){
-		client.query(findComments, [req.body.subdomain_id], function(err, result){
+		client.query(findComments, [req.body.thread_id], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
+router.post('/voteThread', function(req, res){
+	var voteThread = 'UPDATE post.thread SET points = points + $1 WHERE post.thread.id = $2'
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(voteThread, [req.body.vote, req.body.thread_id], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
+router.post('/voteComment', function(req, res){
+	var voteComment = 'UPDATE post.comment SET points = points + $1 WHERE post.comment.id = $2'
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(voteComment, [req.body.vote, req.body.comment_id], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
