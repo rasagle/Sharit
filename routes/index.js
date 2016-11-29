@@ -118,6 +118,10 @@ router.post('/getsubDomain', function(req, res){
 router.post('/createThread', function(req, res){
 	var createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
 	console.log(req.body);
+	console.log(req.body.subdomain_id);
+	console.log(req.body.title);
+	console.log(req.body.author);
+	console.log(req.body.context);
 	pool.connect(function(err, client, done){
 		client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
 			console.log(result.rows);
@@ -151,7 +155,7 @@ router.post('/createComment', function(req, res){
 	});
 });
 
-router.post('/findComment', function(req, res){
+router.post('/getComment', function(req, res){
 	var findComments = 'SELECT * from posts.comment JOIN posts.thread on(thread_id = $1)';
 	console.log(req.body);
 	pool.connect(function(err, client, done){

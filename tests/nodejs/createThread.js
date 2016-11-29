@@ -1,10 +1,10 @@
 var request = require('request');
 
 var jsonBody = {
-	subdomain_id: "1",
-	title: "test",
+	subdomain_id: 1,
+	title: "some title",
 	author: "admin",
-	context: "this is a test"
+	context: "some context"
 }
 
 request({
