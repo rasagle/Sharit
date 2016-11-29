@@ -152,7 +152,7 @@ router.post('/createComment', function(req, res){
 });
 
 router.post('/findComment', function(req, res){
-	var findComments = 'SELECT * from posts.comment JOIN posts.thread WHERE thread_id = $1'
+	var findComments = 'SELECT * from posts.comment JOIN posts.thread on(thread_id = $1)';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(findComments, [req.body.thread_id], function(err, result){
@@ -164,7 +164,11 @@ router.post('/findComment', function(req, res){
 });
 
 router.post('/voteThread', function(req, res){
-	var voteThread = 'UPDATE post.thread SET points = points + $1 WHERE post.thread.id = $2'
+	var voteThread;
+	if (req.body.vote == 1) 
+		voteThread = 'UPDATE posts.thread SET points = points + $1 WHERE posts.thread.id = $2';
+	else
+		voteThread = 'UPDATE posts.thread SET points = points - $1 WHERE posts.thread.id = $2';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(voteThread, [req.body.vote, req.body.thread_id], function(err, result){
@@ -176,7 +180,11 @@ router.post('/voteThread', function(req, res){
 });
 
 router.post('/voteComment', function(req, res){
-	var voteComment = 'UPDATE post.comment SET points = points + $1 WHERE post.comment.id = $2'
+	var voteComment;
+	if (req.body.vote == 1) 
+		var voteComment = 'UPDATE post.comment SET points = points + $1 WHERE post.comment.id = $2';
+	else
+		var voteComment = 'UPDATE post.comment SET points = points - $1 WHERE post.comment.id = $2';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(voteComment, [req.body.vote, req.body.comment_id], function(err, result){
