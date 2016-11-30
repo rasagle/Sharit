@@ -1,11 +1,11 @@
 var request = require('request');
 
 var jsonBody = {
-	subdomain_id: "1",
+	thread_id: 1
 }
 
 request({
-	url: 'http://localhost:3000/getThread',
+	url: 'http://localhost:3000/getComment',
 	method: 'post',
 	json: true,
 	body: jsonBody
