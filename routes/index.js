@@ -117,6 +117,7 @@ router.post('/login', function(req, res){
 	});
 });
 
+
 router.get('/NYU/:sub/:id/:user', function(req, res){
 	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1';
 	pool.connect(function(err, client, done){
@@ -125,6 +126,17 @@ router.get('/NYU/:sub/:id/:user', function(req, res){
 			var user = req.params.user;
 			console.log(user);
 			res.render('index', {threads: result.rows, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user});
+
+router.post('/updatePassword', function(req, res){
+	var updatePassword = 'UPDATE users.user SET password = $1 WHERE username = $2';
+	console.log(req.body);
+	var salt =  bcrypt.genSaltSync(10);
+	var hash = bcrypt.hashSync(req.body.newPassword, salt);
+	pool.connect(function(err, client, done){
+		client.query(updatePassword, [hash, req.body.username], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
 		});
 	});
 });
@@ -225,6 +237,30 @@ router.post('/voteComment', function(req, res){
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(voteComment, [req.body.vote, req.body.comment_id], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
+router.post('/storeFile', function(req, res){
+	var storeFile = 'INSERT INTO posts.file(thread_id, filename, data) VALUES($1, $2, pg_read_binary_file($2.$3)::bytea)';
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(storeFile, [req.body.thread_id, req.body.filename, req.body.extension], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
+router.post('/getFile', function(req, res){
+	var getFile = 'SELECT * FROM posts.file WHERE thread_id = $1';
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(getFile, [req.body.thread_id], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
