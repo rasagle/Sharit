@@ -191,18 +191,6 @@ router.post('/createThread', function(req, res){
 	});
 }
 
-router.post('/storeFile', function(req, res){
-	var storeFile = 'INSERT INTO posts.file(thread_id, filename, data) VALUES($1, $2, pg_read_binary_file($2.$3)::bytea)';
-	console.log(req.body);
-	pool.connect(function(err, client, done){
-		client.query(storeFile, [req.body.thread_id, req.body.filename, req.body.extension], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
-		});
-	});
-});
-
 router.post('/getThread', function(req, res){
 	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1';
 	console.log(req.body);
