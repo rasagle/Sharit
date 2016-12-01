@@ -168,7 +168,7 @@ router.post('/getsubDomain', function(req, res){
 	});
 });
 
-// given subdomain_id, title, author, context, filename, extension
+// given subdomain_id, title, author, context, filename, file
 router.post('/createThread', function(req, res){
 	var createThread;
 	pool.connect(function(err, client, done){
@@ -182,7 +182,7 @@ router.post('/createThread', function(req, res){
 		}
 		else {
 			createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING thread_id AS created_thread_id; INSERT INTO posts.file(thread_id, filename, data) VALUES(created_thread_id, $5, pg_read_binary_file($5.$6)::bytea);';
-			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.body.filename, req.body.extension], function(err, result){
+			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.body.filename, req.body.file], function(err, result){
 				console.log(result.rows);
 				done();
 				res.json(result.rows);
