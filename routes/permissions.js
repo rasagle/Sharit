@@ -42,10 +42,11 @@ router.post('/settings',function(req,res){
 						done();
 						res.send("Success!");
 					}
-						}
+					done();
+				})
 		}
 		done();
-	}}
+	})}
 		else if(type=="addsubdomain")
 		{
 			client.query(queryFindSubDomainUser, [id,username], function(err, result){
@@ -64,10 +65,10 @@ router.post('/settings',function(req,res){
 							res.send('Server Error');
 						}
 						done();
-						}
+					})
 		}
 		done();
-	}}
+	})}
 	else if(type=="moddomain")
 	{
 		client.query(queryFindDomainUser, [id,username], function(err, result){
@@ -86,10 +87,10 @@ router.post('/settings',function(req,res){
 						res.send('Server Error');
 					}
 					done();
-					}
+				})
 	}
 	done();
-}}
+})}
 	else if(type=="modsubdomain")
 	{
 		client.query(queryFindDomainUser, [id,username], function(err, result){
@@ -108,9 +109,8 @@ router.post('/settings',function(req,res){
 						res.send('Server Error');
 					}
 					done();
-					}
+				})
 	}
 	done();
-}}
-
-	}};
+})}
+})});
