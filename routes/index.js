@@ -172,23 +172,24 @@ router.post('/getsubDomain', function(req, res){
 router.post('/createThread', function(req, res){
 	var createThread;
 	pool.connect(function(err, client, done){
-	if (req.body.hasAttachment) {
-		createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
-		client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
-		});
-	}
-	else
-		createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING thread_id AS created_thread_id; INSERT INTO posts.file(thread_id, filename, data) VALUES(created_thread_id, $5, pg_read_binary_file($5.$6)::bytea);';
-		client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.body.filename, req.body.extension], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
-		});
+		if (req.body.hasAttachment) {
+			createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
+			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
+				console.log(result.rows);
+				done();
+				res.json(result.rows);
+			});
+		}
+		else {
+			createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING thread_id AS created_thread_id; INSERT INTO posts.file(thread_id, filename, data) VALUES(created_thread_id, $5, pg_read_binary_file($5.$6)::bytea);';
+			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.body.filename, req.body.extension], function(err, result){
+				console.log(result.rows);
+				done();
+				res.json(result.rows);
+			});
+		}
 	});
-});
+}
 
 router.post('/storeFile', function(req, res){
 	var storeFile = 'INSERT INTO posts.file(thread_id, filename, data) VALUES($1, $2, pg_read_binary_file($2.$3)::bytea)';
