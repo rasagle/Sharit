@@ -28,3 +28,12 @@
 #nyuNav{
 	background-color: #57078E;
 }
+
+.votes{
+	float: left;
+}
+
+.voteButts{
+	width: 25px;
+	height: 25px;
+}

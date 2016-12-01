@@ -1,0 +1,14 @@
+{{#each threads}}
+	<div class="jumbotron">
+		<div class="votes">
+			<button><img src="/images/up.png" class="voteButts"></button><br>
+			<button><img src="/images/down.png" class="voteButts"></button><br>
+			{{points}}
+		</div>
+		<div>
+			<h2><u><a href="#">{{title}}</a><br></u></h2>
+			{{context}}
+			<h5>Created by: <u>{{author}}</u> on {{date_posted}}</h5>
+		</div>
+	</div>
+{{/each}}

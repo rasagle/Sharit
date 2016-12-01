@@ -3,7 +3,7 @@
 <head>
 	<title>Sharit</title>
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+	<link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
 </head>
 <body>
 
@@ -46,7 +46,7 @@
 		<div class={"navbar-collapse " + navClass} id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				{{#each subnav}}
-					<li><a href="/NYU/{{name}}">{{name}}</a></li>
+					<li><a href="/NYU/{{name}}/{{id}}/{{../user}}">{{name}}</a></li>
 				{{/each}}
 			</ul>
 		</div>

@@ -17,12 +17,10 @@ var defaultSub = {
 router.get('/', function(req, res) {
 	var user = req.query.username;
 	if(user){
-		for(var key in req.session[user].subnav){
-			console.log(key, req.session[user].subnav[key]);
-		}
-		res.render('index', {nav: req.session[user].nav, subnav: req.session[user].subnav});
+		console.log(user);	
+		res.render('initial', {nav: req.session[user].nav, subnav: req.session[user].subnav, logged: false, user: user});
 	}else{
-		res.render('initial');
+		res.render('initial', {logged: true});
 	}
 });
 
@@ -115,6 +113,18 @@ router.post('/login', function(req, res){
 				return res.redirect('/login');
 			}
 			done();
+		});
+	});
+});
+
+router.get('/NYU/:sub/:id/:user', function(req, res){
+	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1';
+	pool.connect(function(err, client, done){
+		client.query(findThreads, [req.params.id], function(err, result){
+			done();
+			var user = req.params.user;
+			console.log(user);
+			res.render('index', {threads: result.rows, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user});
 		});
 	});
 });
