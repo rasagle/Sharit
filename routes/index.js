@@ -188,7 +188,7 @@ router.post('/createThread', function(req, res){
 			});
 		}
 		else {
-			createThread = 'WITH created)thread_id AS (INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING id) INSERT INTO posts.file(created_thread_id, filename, data) VALUES(created_thread_id, $5, pg_read_binary_file($5.$6)::bytea);';
+			createThread = 'WITH created_thread_id AS (INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING id) SELECT id, $5, $6 FROM created_thread_id';
 			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.body.filename, req.body.file], function(err, result){
 				console.log(result.rows);
 				done();
