@@ -126,6 +126,9 @@ router.get('/NYU/:sub/:id/:user', function(req, res){
 			var user = req.params.user;
 			console.log(user);
 			res.render('index', {threads: result.rows, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user});
+		});
+	});
+});
 
 router.post('/updatePassword', function(req, res){
 	var updatePassword = 'UPDATE users.user SET password = $1 WHERE username = $2';
