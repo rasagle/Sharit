@@ -15,7 +15,15 @@ var defaultSub = {
 
 /* GET home page. */
 router.get('/', function(req, res) {
-	res.render('index');
+	res.render('initial');
+});
+
+router.get('/login', function(req, res){
+	res.render('login');
+});
+
+router.get('/register', function(req, res){
+	res.render('register');
 });
 
 router.post('/register', function(req, res){
@@ -31,17 +39,17 @@ router.post('/register', function(req, res){
 		client.query(queryFind, [username], function(err, result){
 			if(err){
 				console.log('Error running query', err);
-				res.send('');
+				return res.render('error', {error: err})
 			}
 			if(result.rows.length === 0){
 				client.query(queryInsert, [username, hash, first_name, last_name, email, phone, company, salt], function(err, result){
 					done();
 					if(err){
 						console.log('Error running query', err);
-						res.send('');
+						return res.render('error', {error: err})
 					}
 					console.log(result.rows);
-					res.json(result.rows[0]);
+					res.redirect('/');
 					client.query(domainInsert, [1, username, false], function(err, result){
 						if(err) console.log('Error running query', err);
 						for(var key in defaultSub){
@@ -49,11 +57,10 @@ router.post('/register', function(req, res){
 						}
 						done();
 					});
-
 				});
 			}else{
 				done();
-				res.send('');
+				res.redirect('/register');
 			}
 		});
 	});
