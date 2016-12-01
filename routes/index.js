@@ -15,7 +15,23 @@ var defaultSub = {
 
 /* GET home page. */
 router.get('/', function(req, res) {
-	res.render('index');
+	var user = req.query.username;
+	if(user){
+		for(var key in req.session[user].subnav){
+			console.log(key, req.session[user].subnav[key]);
+		}
+		res.render('index', {nav: req.session[user].nav, subnav: req.session[user].subnav});
+	}else{
+		res.render('initial');
+	}
+});
+
+router.get('/login', function(req, res){
+	res.render('login');
+});
+
+router.get('/register', function(req, res){
+	res.render('register');
 });
 
 router.post('/register', function(req, res){
@@ -31,17 +47,17 @@ router.post('/register', function(req, res){
 		client.query(queryFind, [username], function(err, result){
 			if(err){
 				console.log('Error running query', err);
-				res.send('');
+				return res.render('error', {error: err})
 			}
 			if(result.rows.length === 0){
 				client.query(queryInsert, [username, hash, first_name, last_name, email, phone, company, salt], function(err, result){
 					done();
 					if(err){
 						console.log('Error running query', err);
-						res.send('');
+						return res.render('error', {error: err})
 					}
 					console.log(result.rows);
-					res.json(result.rows[0]);
+					res.redirect('/');
 					client.query(domainInsert, [1, username, false], function(err, result){
 						if(err) console.log('Error running query', err);
 						for(var key in defaultSub){
@@ -49,11 +65,10 @@ router.post('/register', function(req, res){
 						}
 						done();
 					});
-
 				});
 			}else{
 				done();
-				res.send('');
+				res.redirect('/register');
 			}
 		});
 	});
@@ -62,29 +77,42 @@ router.post('/register', function(req, res){
 router.post('/login', function(req, res){
 	var findSalt = 'SELECT salt FROM users.user WHERE username=$1';
 	var validLogin = 'SELECT * FROM users.user WHERE username=$1 and hash=$2';
+	var findDomains = 'SELECT name, id from permissions.domain_user NATURAL JOIN domains.domain WHERE username = $1';
+	var findsubDomains = 'SELECT name, id from permissions.subdomain_user as perm JOIN domains.subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = $1';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		if(err){
 			console.log('Error running query', err);
-			res.send('');
+			return res.render('error', {error: err})
 		}
 		client.query(findSalt, [req.body.username], function(err, result){
 			if(err){
 				console.log('Error running query', err);
-				res.send('');
+				return res.render('error', {error: err})
 			}
 			if(result.rows.length !== 0){
 				var hash = bcrypt.hashSync(req.body.password, result.rows[0].salt);
 				client.query(validLogin, [req.body.username, hash], function(err, result){
 					if(result.rows.length != 0){
-						console.log(result.rows[0]);
-						res.json(result.rows[0]);
+						
+						client.query(findDomains, [req.body.username], function(err, result){
+
+							var domains = result.rows;
+							client.query(findsubDomains, [req.body.username], function(err, result){
+
+								done();
+								var subs = result.rows;
+								req.session[req.body.username] = {nav: domains, subnav: subs};
+								res.redirect('/?username=' + req.body.username);
+							});
+						});
+
 					}
 					else
-						res.send('');
+						return res.redirect('/login');
 				});
 			}else{
-				res.send('');
+				return res.redirect('/login');
 			}
 			done();
 		});
