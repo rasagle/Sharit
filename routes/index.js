@@ -168,10 +168,33 @@ router.post('/getsubDomain', function(req, res){
 	});
 });
 
+// given subdomain_id, title, author, context, filename, extension
 router.post('/createThread', function(req, res){
-	var createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
+	var createThread;
 	pool.connect(function(err, client, done){
+	if (req.body.hasAttachment) {
+		createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
 		client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	}
+	else
+		createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING thread_id AS created_thread_id; INSERT INTO posts.file(thread_id, filename, data) VALUES(created_thread_id, $5, pg_read_binary_file($5.$6)::bytea);';
+		client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.body.filename, req.body.extension], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
+router.post('/storeFile', function(req, res){
+	var storeFile = 'INSERT INTO posts.file(thread_id, filename, data) VALUES($1, $2, pg_read_binary_file($2.$3)::bytea)';
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(storeFile, [req.body.thread_id, req.body.filename, req.body.extension], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
@@ -184,6 +207,18 @@ router.post('/getThread', function(req, res){
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(findThreads, [req.body.subdomain_id], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
+router.post('/showThread', function(req, res){
+	var showThread = 'SELECT * FROM posts.thread JOIN posts.file WHERE thread_id = $1';
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(showThread, [req.body.thread_id], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
@@ -240,30 +275,6 @@ router.post('/voteComment', function(req, res){
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(voteComment, [req.body.vote, req.body.comment_id], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
-		});
-	});
-});
-
-router.post('/storeFile', function(req, res){
-	var storeFile = 'INSERT INTO posts.file(thread_id, filename, data) VALUES($1, $2, pg_read_binary_file($2.$3)::bytea)';
-	console.log(req.body);
-	pool.connect(function(err, client, done){
-		client.query(storeFile, [req.body.thread_id, req.body.filename, req.body.extension], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
-		});
-	});
-});
-
-router.post('/getFile', function(req, res){
-	var getFile = 'SELECT * FROM posts.file WHERE thread_id = $1';
-	console.log(req.body);
-	pool.connect(function(err, client, done){
-		client.query(getFile, [req.body.thread_id], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
