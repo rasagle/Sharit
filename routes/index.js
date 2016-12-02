@@ -192,7 +192,6 @@ router.post('/getsubDomain', function(req, res){
 router.post('/createThread', upload.single('file'), function(req, res){
 	var createThread;
 	console.log(req.body);
-	console.log(req.file);
 
 	pool.connect(function(err, client, done){
 		if (!req.file) { // no file
@@ -207,6 +206,7 @@ router.post('/createThread', upload.single('file'), function(req, res){
 			});
 		}
 		else { // there is file
+			console.log(req.file);
 			if (err) console.log(err);
 			createThread = 'WITH created_thread_id AS ' + 
 			'(INSERT INTO posts.thread(subdomain_id, title, author, context) ' + 
@@ -226,8 +226,24 @@ router.post('/createThread', upload.single('file'), function(req, res){
 	});
 });
 
+// given file id
+// sends back binary data
+router.post('/downloadFile', function(req, res){
+	//var encode = 'base64';
+	//var downloadFile = 'SELECT encode(data, $1) FROM posts.file WHERE id = $2';
+	var downloadFile = 'SELECT data FROM posts.file WHERE id = $1';
+	console.log(req.body);
+	pool.connect(function(err, client, done){
+		client.query(downloadFile, [req.body.id], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
 router.post('/getThread', function(req, res){
-	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1';
+	var findThreads = 'SELECT * FROM posts.thread WHERE subdomain_id = $1';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(findThreads, [req.body.subdomain_id], function(err, result){
@@ -249,6 +265,8 @@ router.post('/showThread', function(req, res){
 		});
 	});
 });
+
+
 
 router.post('/createComment', function(req, res){
 	var createComment = 'INSERT into posts.comment(thread_id, author, comment) values($1, $2, $3)';
