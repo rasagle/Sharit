@@ -4,7 +4,17 @@ var bcrypt = require('bcryptjs');
 
 var fs = require('fs');
 var multer = require('multer');
-var upload = multer({ dest: './uploads/' })
+
+// var storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, '/var/lib/postgresql/9.5/main')
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, file.originalname + '-' + Date.now())
+//   }
+// })
+
+var upload = multer({ dest: '/var/lib/postgresql/9.5/main' })
 
 var router = express.Router();
 
@@ -184,32 +194,36 @@ router.post('/createThread', upload.single('file'), function(req, res){
 	console.log(req.body);
 	console.log(req.file);
 
-	// pool.connect(function(err, client, done){
-	// 	if (!req.body.file) {
-	// 		createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
-	// 		client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
-	// 			if (err) console.log(err);
-
-	// 			console.log(result.rows);
-	// 			done();
-	// 			res.json(result.rows);
-	// 		});
-	// 	}
-	// 	else {
-	// 		fs.readFile(req.body.file, 'utf8', function (err, data) {
-	// 			if (err) console.log(err);
-	// 			console.log(data);
-
-	// 			createThread = 'WITH created_thread_id AS (INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING id) SELECT id, $5, $6 FROM created_thread_id';
-	// 			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.body.filename, data], function(err, result){
-	// 				if (err) console.log(err);
-	// 				console.log(result.rows);
-	// 				done();
-	// 				res.json(result.rows);
-	// 			});
-	// 		});
-	// 	}
-	// });
+	pool.connect(function(err, client, done){
+		if (!req.file) { // no file
+			createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
+			
+			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
+				if (err) console.log(err);
+				console.log(result.rows);
+				
+				done();
+				res.json(result.rows);
+			});
+		}
+		else { // there is file
+			if (err) console.log(err);
+			createThread = 'WITH created_thread_id AS ' + 
+			'(INSERT INTO posts.thread(subdomain_id, title, author, context) ' + 
+			'VALUES($1, $2, $3, $4) ' + 'RETURNING id) ' + 
+			'INSERT INTO posts.file(thread_id, filename, data) ' + 
+			'SELECT id, $5, pg_read_binary_file($6)::bytea ' + 
+			'FROM created_thread_id';
+			
+			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.file.originalname, req.file.filename], function(err, result){
+				if (err) console.log(err);
+				console.log(result.rows);
+					
+				done();
+				res.json(result.rows);
+			});
+		}
+	});
 });
 
 router.post('/getThread', function(req, res){
