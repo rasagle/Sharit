@@ -14,7 +14,11 @@ var multer = require('multer');
 //   }
 // })
 
-var upload = multer({ dest: '/var/lib/postgresql/9.5/main' })
+var isWin = /^win/.test(process.platform);
+
+var destStr = isWin ? 'C:/Program Files/PostgreSQL/9.6/data' : '/var/lib/postgresql/9.5/main';
+
+var upload = multer({ dest: destStr })
 
 var router = express.Router();
 
@@ -45,10 +49,6 @@ router.get('/login', function(req, res){
 
 router.get('/register', function(req, res){
 	res.render('register');
-});
-
-router.get('/createThread', function(req, res){
-	res.render('createThread');
 });
 
 router.post('/register', function(req, res){
@@ -136,14 +136,14 @@ router.post('/login', function(req, res){
 	});
 });
 
-router.get('/NYU/:sub/:id/:user', function(req, res){
+router.get('/NYU/:sub/:subid/:user', function(req, res){
 	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1';
 	pool.connect(function(err, client, done){
-		client.query(findThreads, [req.params.id], function(err, result){
+		client.query(findThreads, [req.params.subid], function(err, result){
 			done();
 			var user = req.params.user;
 			console.log(user);
-			res.render('index', {threads: result.rows, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user});
+			res.render('index', {threads: result.rows, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub});
 		});
 	});
 });
@@ -192,11 +192,15 @@ router.post('/getsubDomain', function(req, res){
 	});
 });
 
+router.get('/NYU/:sub/:subid/:user/createThread', function(req, res){
+	var user = req.params.user;
+	res.render('createThread', {nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub});
+});
 
 // 5 user params: subdomain_id, title, author, context, file
 // creates thread w/ file if attached
 // file uploaded in postgres' default db folder
-router.post('/createThread', upload.single('file'), function(req, res){
+router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), function(req, res){
 	var createThread;
 	console.log(req.body);
 
@@ -204,7 +208,7 @@ router.post('/createThread', upload.single('file'), function(req, res){
 		if (!req.file) { // no file
 			createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
 			
-			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
+			client.query(createThread, [req.params.subid, req.body.title, req.params.user, req.body.context], function(err, result){
 				if (err) console.log(err);
 				console.log(result.rows);
 				
@@ -222,12 +226,12 @@ router.post('/createThread', upload.single('file'), function(req, res){
 			'SELECT id, $5, pg_read_binary_file($6)::bytea ' + 
 			'FROM created_thread_id';
 			
-			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.file.originalname, req.file.filename], function(err, result){
+			client.query(createThread, [req.params.subid, req.body.title, req.params.user, req.body.context, req.file.originalname, req.file.filename], function(err, result){
 				if (err) console.log(err);
 				console.log(result.rows);
 					
 				done();
-				res.json(result.rows);
+				res.redirect('/NYU/' + req.params.sub + '/' + req.params.subid + '/' + req.params.user);
 			});
 		}
 	});
