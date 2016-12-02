@@ -1,6 +1,11 @@
 var express = require('express');
 var pg = require('pg');
 var bcrypt = require('bcryptjs');
+
+var fs = require('fs');
+var multer = require('multer');
+var upload = multer({ dest: './uploads/' })
+
 var router = express.Router();
 
 var configDB = require('../config/dbconfig.js');
@@ -174,28 +179,37 @@ router.post('/getsubDomain', function(req, res){
 
 
 // given subdomain_id, title, author, context, filename, file
-// WITH employee AS (SELECT * FROM posts.thread) SELECT * FROM employee WHERE id = 1
-// WITH created_thread_id AS (INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES(1, 'fknhui', 'admin', 'fknhui') RETURNING id INSERT INTO
-router.post('/createThread', function(req, res){
+router.post('/createThread', upload.single('file'), function(req, res){
 	var createThread;
-	pool.connect(function(err, client, done){
-		if (req.body.hasAttachment) {
-			createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
-			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
-				console.log(result.rows);
-				done();
-				res.json(result.rows);
-			});
-		}
-		else {
-			createThread = 'WITH created_thread_id AS (INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING id) SELECT id, $5, $6 FROM created_thread_id';
-			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.body.filename, req.body.file], function(err, result){
-				console.log(result.rows);
-				done();
-				res.json(result.rows);
-			});
-		}
-	});
+	console.log(req.body);
+	console.log(req.file);
+
+	// pool.connect(function(err, client, done){
+	// 	if (!req.body.file) {
+	// 		createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
+	// 		client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context], function(err, result){
+	// 			if (err) console.log(err);
+
+	// 			console.log(result.rows);
+	// 			done();
+	// 			res.json(result.rows);
+	// 		});
+	// 	}
+	// 	else {
+	// 		fs.readFile(req.body.file, 'utf8', function (err, data) {
+	// 			if (err) console.log(err);
+	// 			console.log(data);
+
+	// 			createThread = 'WITH created_thread_id AS (INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING id) SELECT id, $5, $6 FROM created_thread_id';
+	// 			client.query(createThread, [req.body.subdomain_id, req.body.title, req.body.author, req.body.context, req.body.filename, data], function(err, result){
+	// 				if (err) console.log(err);
+	// 				console.log(result.rows);
+	// 				done();
+	// 				res.json(result.rows);
+	// 			});
+	// 		});
+	// 	}
+	// });
 });
 
 router.post('/getThread', function(req, res){
