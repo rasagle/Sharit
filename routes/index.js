@@ -136,7 +136,6 @@ router.post('/login', function(req, res){
 	});
 });
 
-
 router.get('/NYU/:sub/:id/:user', function(req, res){
 	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1';
 	pool.connect(function(err, client, done){
@@ -149,6 +148,8 @@ router.get('/NYU/:sub/:id/:user', function(req, res){
 	});
 });
 
+// 2 user params: newPassword, username
+// successfully updates password w/ new hash
 router.post('/updatePassword', function(req, res){
 	var updatePassword = 'UPDATE users.user SET password = $1 WHERE username = $2';
 	console.log(req.body);
@@ -163,6 +164,8 @@ router.post('/updatePassword', function(req, res){
 	});
 });
 
+// 1 user param: username
+// returns all domains user is a subscriber of
 router.post('/getDomain', function(req, res){
 	var findDomains = 'SELECT name, id from permissions.domain_user NATURAL JOIN domains.domain WHERE username = $1';
 	console.log(req.body);
@@ -175,6 +178,8 @@ router.post('/getDomain', function(req, res){
 	});
 });
 
+// 1 user param: username
+// returns all subdomains user is a subscriber of
 router.post('/getsubDomain', function(req, res){
 	var findsubDomains = 'SELECT name, id from permissions.subdomain_user as perm JOIN domains.subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = $1';
 	console.log(req.body);
@@ -188,7 +193,9 @@ router.post('/getsubDomain', function(req, res){
 });
 
 
-// given subdomain_id, title, author, context, filename, file
+// 5 user params: subdomain_id, title, author, context, file
+// creates thread w/ file if attached
+// file uploaded in postgres' default db folder
 router.post('/createThread', upload.single('file'), function(req, res){
 	var createThread;
 	console.log(req.body);
@@ -226,7 +233,7 @@ router.post('/createThread', upload.single('file'), function(req, res){
 	});
 });
 
-// given file id
+// 1 user param: id (file id)
 // sends back binary data
 router.post('/downloadFile', function(req, res){
 	//var encode = 'base64';
@@ -242,20 +249,24 @@ router.post('/downloadFile', function(req, res){
 	});
 });
 
-router.post('/getThread', function(req, res){
-	var findThreads = 'SELECT * FROM posts.thread WHERE subdomain_id = $1';
-	console.log(req.body);
-	pool.connect(function(err, client, done){
-		client.query(findThreads, [req.body.subdomain_id], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
-		});
-	});
-});
 
-router.post('/showThread', function(req, res){
-	var showThread = 'SELECT * FROM posts.thread JOIN posts.file WHERE thread_id = $1';
+// router.post('/getThread', function(req, res){
+// 	var findThreads = 'SELECT * FROM posts.thread WHERE subdomain_id = $1';
+// 	console.log(req.body);
+// 	pool.connect(function(err, client, done){
+// 		client.query(findThreads, [req.body.subdomain_id], function(err, result){
+// 			console.log(result.rows);
+// 			done();
+// 			res.json(result.rows);
+// 		});
+// 	});
+// });
+
+
+// 1 user param: thread_id
+// returns all information about thread_id, including file if attached
+router.post('/viewThread', function(req, res){
+	var viewThread = 'SELECT * FROM posts.thread JOIN posts.file WHERE thread_id = $1';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(showThread, [req.body.thread_id], function(err, result){
@@ -267,12 +278,13 @@ router.post('/showThread', function(req, res){
 });
 
 
-
+// 3 user params: thread_id, username, comment
+// successfully creates a comment under that thread
 router.post('/createComment', function(req, res){
 	var createComment = 'INSERT into posts.comment(thread_id, author, comment) values($1, $2, $3)';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
-		client.query(createComment, [req.body.thread_id, req.body.author, req.body.comment], function(err, result){
+		client.query(createComment, [req.body.thread_id, req.body.username, req.body.comment], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
@@ -280,9 +292,13 @@ router.post('/createComment', function(req, res){
 	});
 });
 
+
+// 1 user params: thread_id
+// returns all comments from that thread
 router.post('/getComment', function(req, res){
-	var findComments = 'SELECT * from posts.comment JOIN posts.thread on(thread_id = $1)';
+	var findComments = 'SELECT * from posts.comment JOIN posts.thread ON(thread_id = $1)';
 	console.log(req.body);
+
 	pool.connect(function(err, client, done){
 		client.query(findComments, [req.body.thread_id], function(err, result){
 			console.log(result.rows);
@@ -292,13 +308,13 @@ router.post('/getComment', function(req, res){
 	});
 });
 
+
+// 1 user param: vote (either +1 or -1)
+// successfully update points of the thread
 router.post('/voteThread', function(req, res){
-	var voteThread;
-	if (req.body.vote == 1) 
-		voteThread = 'UPDATE posts.thread SET points = points + $1 WHERE posts.thread.id = $2';
-	else
-		voteThread = 'UPDATE posts.thread SET points = points - $1 WHERE posts.thread.id = $2';
 	console.log(req.body);
+	var voteThread = 'UPDATE posts.thread SET points = points + $1 WHERE posts.thread.id = $2';
+	// var trackRating = 'INSERT INTO ratings.
 	pool.connect(function(err, client, done){
 		client.query(voteThread, [req.body.vote, req.body.thread_id], function(err, result){
 			console.log(result.rows);
@@ -308,15 +324,79 @@ router.post('/voteThread', function(req, res){
 	});
 });
 
+
+// 1 user param: vote (either +1 or -1)
+// successfully update points of the comment
 router.post('/voteComment', function(req, res){
-	var voteComment;
-	if (req.body.vote == 1) 
-		var voteComment = 'UPDATE posts.comment SET points = points + $1 WHERE post.comment.id = $2';
-	else
-		var voteComment = 'UPDATE posts.comment SET points = points - $1 WHERE post.comment.id = $2';
+	var voteComment = 'UPDATE posts.comment SET points = points + $1 WHERE post.comment.id = $2';
 	console.log(req.body);
+
 	pool.connect(function(err, client, done){
 		client.query(voteComment, [req.body.vote, req.body.comment_id], function(err, result){
+			console.log(result.rows);
+			done();
+			res.json(result.rows);
+		});
+	});
+});
+
+
+// Not done
+// return top 10 threads of each subdomain user is in
+// router.post('/getHotThreads', function(req, res){
+// 	var hotThreads = 'SELECT * from posts.thread JOIN permissions.subdomain_user ON(username = $1) ORDER BY points DESC LIMIT 10';
+// 	console.log(req.body);
+
+// 	pool.connect(function(err, client, done){
+// 		client.query(hotThreads, [req.body.username], function(err, result){
+// 			console.log(result.rows);
+// 			done();
+// 			res.json(result.rows);
+// 		});
+// 	});
+// });
+
+
+// Not done
+// return fresh 10 threads of each subdomain user is in
+// router.post('/getFreshThreads', function(req, res){
+// 	var getFreshThreads = 'SELECT * from posts.thread JOIN permissions.subdomain_user ON(username = $1) ORDER BY date_posted DESC LIMIT 10';
+// 	console.log(req.body);
+
+// 	pool.connect(function(err, client, done){
+// 		client.query(getFreshThreads, [req.body.username], function(err, result){
+// 			console.log(result.rows);
+// 			done();
+// 			res.json(result.rows);
+// 		});
+// 	});
+// });
+
+
+// Not done
+// return all upvoted threads user upvoted
+// router.post('/getUpvotedThreads', function(req, res){
+// 	var getUpvotedThreads = 'SELECT * FROM posts.thread JOIN ratings.ThreadRating ON(thread_id) WHERE user AND (rating == 1)';
+// 	console.log(req.body);
+
+// 	pool.connect(function(err, client, done){
+// 		client.query(getUpvotedThreads, [req.body.username], function(err, result){
+// 			console.log(result.rows);
+// 			done();
+// 			res.json(result.rows);
+// 		});
+// 	});
+// });
+
+
+// 1 user param: username
+// get all user's comment ever posted
+router.post('/getCommentPosted', function(req, res){
+	var userComments = 'SELECT * from posts.comment JOIN posts.thread ON(author = $1)';
+	console.log(req.body);
+
+	pool.connect(function(err, client, done){
+		client.query(userComments, [req.body.username], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);

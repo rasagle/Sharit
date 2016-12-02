@@ -1,7 +1,7 @@
 var request = require('request');
 
 var jsonBody = {
-	vote: 1,
+	vote: -1,
 	thread_id: 1
 }
 

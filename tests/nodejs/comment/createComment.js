@@ -2,7 +2,7 @@ var request = require('request');
 
 var jsonBody = {
 	thread_id: 1,
-	author: "admin",
+	username: "admin",
 	comment: "some comment"
 }
 
