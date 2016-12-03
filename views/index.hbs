@@ -1,17 +1,21 @@
 <a href="/NYU/{{sub}}/{{subid}}/{{user}}/createThread"><button class="btn btn-warning">Create Thread</button></a>
 
 </br></br>
-{{#each threads}}
-	<div class="jumbotron">
-		<div class="votes">
-			<button><img src="/images/up.png" class="voteButts"></button><br>
-			<button><img src="/images/down.png" class="voteButts"></button><br>
-			{{points}}
-		</div>
-		<div>
-			<h2><u><a href="/NYU/{{../sub}}/{{../subid}}/{{../user}}/{{id}}">{{title}}</a><br></u></h2>
-			{{context}}
-			<h5>Created by: <u>{{author}}</u> on {{date_posted}}</h5>
-		</div>
-	</div><br>
-{{/each}}
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		{{#each threads}}
+			<div class="jumbotron">
+				<div class="votes">
+					<button><img src="/images/up.png" class="voteButts"></button><br>
+					{{points}} <br>
+					<button><img src="/images/down.png" class="voteButts"></button><br>
+				</div>
+				<div>
+					<h2><u><a href="/NYU/{{../sub}}/{{../subid}}/{{../user}}/{{id}}">{{title}}</a><br></u></h2>
+					{{context}}
+					<h5>Created by: <u>{{author}}</u> on {{date_posted}}</h5>
+				</div>
+			</div><br>
+		{{/each}}
+	</div>
+</div>

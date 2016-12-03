@@ -31,9 +31,11 @@
 
 .votes{
 	float: left;
+	text-align: center;
 }
 
 .voteButts{
 	width: 25px;
 	height: 25px;
 }
+

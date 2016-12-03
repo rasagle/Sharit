@@ -279,7 +279,7 @@ router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 		client.query(threads, [req.params.thread_id], function(err, thread){
 			client.query(comments, [req.params.thread_id], function(err, comments){
 				client.query(file, [req.params.thread_id], function(err, filename){
-					console.log(filename.rows[0]);
+					console.log(comments.rows);
 					res.render('threadContent', {thread: thread.rows[0], comments: comments.rows, filename: filename.rows[0], nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub})
 				});	
 			});

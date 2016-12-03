@@ -1,29 +1,32 @@
-
-<div class="jumbotron">
-	<div class="votes">
-		<button><img src="/images/up.png" class="voteButts"></button><br>
-		<button><img src="/images/down.png" class="voteButts"></button><br>
-		{{thread.points}}
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<div class="jumbotron">
+			<div class="votes">
+				<button><img src="/images/up.png" class="voteButts"></button><br>
+				{{thread.points}} <br>
+				<button><img src="/images/down.png" class="voteButts"></button><br>
+			</div>
+			<div>
+				<h2>{{thread.title}}<br></h2>
+				{{thread.context}}
+				<h5>Created by: <u>{{thread.author}}</u> on {{thread.date_posted}}</h5>
+				Attached File: <a href="/downloadFile/{{thread.id}}" target="_blank">{{filename.filename}}</a>
+			</div>
+		</div><br>
 	</div>
-	<div>
-		<h2>{{thread.title}}<br></h2>
-		{{thread.context}}
-		<h5>Created by: <u>{{thread.author}}</u> on {{thread.date_posted}}</h5>
-		Attached File: <a href="/downloadFile/{{thread.id}}" target="_blank">{{filename.filename}}</a>
-	</div>
-</div><br>
+</div>
 
 
-{{#each commnets}}
+{{#each comments}}
 	<hr>
-	<div>
+	<div class="comments">
 		<div class="votes">
 			<button><img src="/images/up.png" class="voteButts"></button><br>
 			{{points}} <br>
 			<button><img src="/images/down.png" class="voteButts"></button><br>
 		</div>
 		<div>
-			<h3>{{comment}}</h3>{{comment}} <br>
+			<h3>{{comment}}</h3>
 			<h5>By: <u>{{author}}</u> on {{date_posted}}</h5>
 		</div>
 	</div>
