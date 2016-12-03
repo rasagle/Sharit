@@ -253,13 +253,9 @@ router.post('/downloadFile', function(req, res){
 			done();
 			var filename = result.rows[0].filename;
     		var data = result.rows[0].data;
-      		
-      		res.writeHead(200, {
-        	'Content-Type': 'application/octet-stream',
-        	'Content-disposition': 'attachment;filename=' + filename,
-        	'Content-Length': data.length
-    		});
-    		res.end(new Buffer(data, 'binary'));
+    		
+    		res.set('Content-disposition', 'attachment;filename=' + filename);
+    		res.send(new Buffer(data, 'binary'));
 		});
 	});
 });
