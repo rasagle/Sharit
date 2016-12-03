@@ -275,19 +275,19 @@ router.post('/downloadFile', function(req, res){
 
 
 // 1 user param: thread_id
-// returns all information about thread_id, including file if attached
+// returns all information about thread_id, file name and id (use downloadFile route to get file), comments
 router.post('/viewThread', function(req, res){
-	var viewThread = 'SELECT * FROM posts.thread JOIN posts.file WHERE thread_id = $1';
 	console.log(req.body);
+	var viewThread = 'SELECT thread.id, thread.subdomain_id, thread.author, thread.date_posted, thread.title, thread.context, thread.points, thread.stickied, comment.id, comment.comment_id, comment.author, comment.date_posted, comment.comment, comment.points, comment.stickied, file.id, file.filename FROM posts.thread JOIN posts.file ON(thread.id = $1) JOIN posts.comment ON(comment.thread_id = $1)';
+
 	pool.connect(function(err, client, done){
-		client.query(showThread, [req.body.thread_id], function(err, result){
+		client.query(viewThread, [req.body.id], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
 		});
 	});
 });
-
 
 // 3 user params: thread_id, username, comment
 // successfully creates a comment under that thread
@@ -296,22 +296,6 @@ router.post('/createComment', function(req, res){
 	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(createComment, [req.body.thread_id, req.body.username, req.body.comment], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
-		});
-	});
-});
-
-
-// 1 user params: thread_id
-// returns all comments from that thread
-router.post('/getComment', function(req, res){
-	var findComments = 'SELECT * from posts.comment JOIN posts.thread ON(thread_id = $1)';
-	console.log(req.body);
-
-	pool.connect(function(err, client, done){
-		client.query(findComments, [req.body.thread_id], function(err, result){
 			console.log(result.rows);
 			done();
 			res.json(result.rows);
