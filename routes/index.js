@@ -237,18 +237,11 @@ router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), functi
 	});
 });
 
-
-router.get('/downloadFile', function(req, res){
-	res.render('downloadFile');
-});
-
-
-router.post('/downloadFile', function(req, res){
-	console.log(req.body);
+router.get('/downloadFile/:thread_id', function(req, res){
 	var downloadFile = 'SELECT filename, data FROM posts.file WHERE thread_id = $1';
 
 	pool.connect(function(err, client, done){
-		client.query(downloadFile, [req.body.thread_id], function(err, result){
+		client.query(downloadFile, [req.params.thread_id], function(err, result){
 			// console.log(result.rows); // massive wall of text
 			done();
 			var filename = result.rows[0].filename;
@@ -276,15 +269,20 @@ router.post('/downloadFile', function(req, res){
 
 // 1 user param: thread_id
 // returns all information about thread_id, file name and id (use downloadFile route to get file), comments
-router.post('/viewThread', function(req, res){
-	console.log(req.body);
-	var viewThread = 'SELECT thread.id, thread.subdomain_id, thread.author, thread.date_posted, thread.title, thread.context, thread.points, thread.stickied, comment.id, comment.comment_id, comment.author, comment.date_posted, comment.comment, comment.points, comment.stickied, file.id, file.filename FROM posts.thread JOIN posts.file ON(thread.id = $1) JOIN posts.comment ON(comment.thread_id = $1)';
-
+router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
+	var user = req.params.user;
+	//var viewThread = 'SELECT thread.id, thread.subdomain_id, thread.author, thread.date_posted, thread.title, thread.context, thread.points, thread.stickied, comment.id, comment.comment_id, comment.author, comment.date_posted, comment.comment, comment.points, comment.stickied, file.id, file.filename FROM posts.thread JOIN posts.file ON(thread.id = $1) JOIN posts.comment ON(comment.thread_id = $1)';
+	var threads = 'SELECT * FROM posts.thread WHERE id = $1';
+	var comments = 'SELECT * FROM posts.comment WHERE thread_id = $1';
+	var file = 'SELECT filename FROM posts.thread JOIN posts.file ON(thread.id = file.thread_id) WHERE thread_id = $1';
 	pool.connect(function(err, client, done){
-		client.query(viewThread, [req.body.id], function(err, result){
-			console.log(result.rows);
-			done();
-			res.json(result.rows);
+		client.query(threads, [req.params.thread_id], function(err, thread){
+			client.query(comments, [req.params.thread_id], function(err, comments){
+				client.query(file, [req.params.thread_id], function(err, filename){
+					console.log(filename.rows[0]);
+					res.render('threadContent', {thread: thread.rows[0], comments: comments.rows, filename: filename.rows[0], nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub})
+				});	
+			});
 		});
 	});
 });

@@ -1,0 +1,30 @@
+
+<div class="jumbotron">
+	<div class="votes">
+		<button><img src="/images/up.png" class="voteButts"></button><br>
+		<button><img src="/images/down.png" class="voteButts"></button><br>
+		{{thread.points}}
+	</div>
+	<div>
+		<h2>{{thread.title}}<br></h2>
+		{{thread.context}}
+		<h5>Created by: <u>{{thread.author}}</u> on {{thread.date_posted}}</h5>
+		Attached File: <a href="/downloadFile/{{thread.id}}" target="_blank">{{filename.filename}}</a>
+	</div>
+</div><br>
+
+
+{{#each commnets}}
+	<hr>
+	<div>
+		<div class="votes">
+			<button><img src="/images/up.png" class="voteButts"></button><br>
+			{{points}} <br>
+			<button><img src="/images/down.png" class="voteButts"></button><br>
+		</div>
+		<div>
+			<h3>{{comment}}</h3>{{comment}} <br>
+			<h5>By: <u>{{author}}</u> on {{date_posted}}</h5>
+		</div>
+	</div>
+{{/each}}
