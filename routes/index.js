@@ -245,25 +245,21 @@ router.get('/downloadFile', function(req, res){
 
 router.post('/downloadFile', function(req, res){
 	console.log(req.body);
-	var getFilename = 'SELECT filename FROM posts.file WHERE thread_id = $1';
+	var downloadFile = 'SELECT filename, data FROM posts.file WHERE thread_id = $1';
 
 	pool.connect(function(err, client, done){
-		client.query(getFilename, [req.body.thread_id], function(err, result){
-			console.log(result.rows);
+		client.query(downloadFile, [req.body.thread_id], function(err, result){
+			// console.log(result.rows); // massive wall of text
+			done();
 			var filename = result.rows[0].filename;
-			var downloadFile = 'SELECT data FROM posts.file WHERE thread_id = $1';
-
-			client.query(downloadFile, [req.body.thread_id], function(err, result){
-				// console.log(result.rows); // massive wall of text
-				done();
-    			data = result.rows[0].data;
-      			res.writeHead(200, {
-        		'Content-Type': 'application/octet-stream',
-        		'Content-disposition': 'attachment;filename=' + filename,
-        		'Content-Length': data.length
-    			});
-    			res.end(new Buffer(data, 'binary'));
-			});
+    		var data = result.rows[0].data;
+      		
+      		res.writeHead(200, {
+        	'Content-Type': 'application/octet-stream',
+        	'Content-disposition': 'attachment;filename=' + filename,
+        	'Content-Length': data.length
+    		});
+    		res.end(new Buffer(data, 'binary'));
 		});
 	});
 });
