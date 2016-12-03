@@ -237,18 +237,22 @@ router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), functi
 	});
 });
 
+
+router.get('/downloadFile', function(req, res){
+	res.render('downloadFile');
+});
+
+
 // 1 user param: id (file id)
 // sends back binary data
 router.post('/downloadFile', function(req, res){
-	//var encode = 'base64';
-	//var downloadFile = 'SELECT encode(data, $1) FROM posts.file WHERE id = $2';
 	var downloadFile = 'SELECT data FROM posts.file WHERE id = $1';
 	console.log(req.body);
 	pool.connect(function(err, client, done){
-		client.query(downloadFile, [req.body.id], function(err, result){
-			console.log(result.rows);
+		client.query(downloadFile, [req.body.file_id], function(err, result){
 			done();
-			res.json(result.rows);
+    		fs.writeFile('/tmp/foo.pdf', result.rows[0].data);
+    		res.status(200).json( {success: true });
 		});
 	});
 });
