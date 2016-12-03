@@ -3,8 +3,9 @@ import json
 import sys
 
 jsonBody = {
-	"vote": 1,
-	"thread_id": 1
+	"thread_id": 1,
+	"username": 'admin',
+	"rating": 1
 }
 
 headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}

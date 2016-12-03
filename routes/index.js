@@ -55,11 +55,11 @@ router.post('/register', function(req, res){
 	var salt =  bcrypt.genSaltSync(10);
 	var {username, password, first_name, last_name, email, phone, company} = req.body;
 	var hash = bcrypt.hashSync(password, salt);
+	var queryFind = 'SELECT username FROM users.user WHERE username=$1';
+	var queryInsert = 'INSERT INTO users.user(username, hash, first_name, last_name, email, phone, company, salt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING username';
+	var domainInsert = 'INSERT INTO permissions.domain_user VALUES($1, $2, $3)';
+	var subInsert = 'INSERT INTO permissions.subdomain_user VALUES($1, $2, $3)';
 	pool.connect(function(err, client, done){
-		var queryFind = 'SELECT username FROM users.user WHERE username=$1';
-		var queryInsert = 'INSERT INTO users.user(username, hash, first_name, last_name, email, phone, company, salt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING username';
-		var domainInsert = 'INSERT INTO permissions.domain_user VALUES($1, $2, $3)';
-		var subInsert = 'INSERT INTO permissions.subdomain_user VALUES($1, $2, $3)';
 
 		client.query(queryFind, [username], function(err, result){
 			if(err){
@@ -254,27 +254,14 @@ router.get('/downloadFile/:thread_id', function(req, res){
 });
 
 
-// router.post('/getThread', function(req, res){
-// 	var findThreads = 'SELECT * FROM posts.thread WHERE subdomain_id = $1';
-// 	console.log(req.body);
-// 	pool.connect(function(err, client, done){
-// 		client.query(findThreads, [req.body.subdomain_id], function(err, result){
-// 			console.log(result.rows);
-// 			done();
-// 			res.json(result.rows);
-// 		});
-// 	});
-// });
-
-
 // 1 user param: thread_id
 // returns all information about thread_id, file name and id (use downloadFile route to get file), comments
 router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 	var user = req.params.user;
-	//var viewThread = 'SELECT thread.id, thread.subdomain_id, thread.author, thread.date_posted, thread.title, thread.context, thread.points, thread.stickied, comment.id, comment.comment_id, comment.author, comment.date_posted, comment.comment, comment.points, comment.stickied, file.id, file.filename FROM posts.thread JOIN posts.file ON(thread.id = $1) JOIN posts.comment ON(comment.thread_id = $1)';
 	var threads = 'SELECT * FROM posts.thread WHERE id = $1';
 	var comments = 'SELECT * FROM posts.comment WHERE thread_id = $1';
 	var file = 'SELECT filename FROM posts.thread JOIN posts.file ON(thread.id = file.thread_id) WHERE thread_id = $1';
+
 	pool.connect(function(err, client, done){
 		client.query(threads, [req.params.thread_id], function(err, thread){
 			client.query(comments, [req.params.thread_id], function(err, comments){
@@ -287,8 +274,6 @@ router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 	});
 });
 
-// 3 user params: thread_id, username, comment
-// successfully creates a comment under that thread
 router.post('/createComment', function(req, res){
 	var createComment = 'INSERT into posts.comment(thread_id, author, comment) values($1, $2, $3)';
 	console.log(req.body);
@@ -301,34 +286,57 @@ router.post('/createComment', function(req, res){
 	});
 });
 
-
-// 1 user param: vote (either +1 or -1)
-// successfully update points of the thread
 router.post('/voteThread', function(req, res){
 	console.log(req.body);
-	var voteThread = 'UPDATE posts.thread SET points = points + $1 WHERE posts.thread.id = $2';
-	// var trackRating = 'INSERT INTO ratings.
+	var voteThread = 'INSERT INTO ratings."ThreadRating"(thread_id, username, rating) VALUES($1, $2, $3)';
+	var queryFind = 'SELECT username FROM ratings."ThreadRating" WHERE thread_id = $1 and username = $2';
+	var updateVote = 'UPDATE ratings."ThreadRating" SET rating = $3 WHERE thread_id = $1 and username = $2';
+
 	pool.connect(function(err, client, done){
-		client.query(voteThread, [req.body.vote, req.body.thread_id], function(err, result){
-			console.log(result.rows);
+		client.query(queryFind, [req.body.thread_id, req.body.username], function(err, result){
+			if (result.rows.length === 0) { // user rating not found, so insert new rating
+				client.query(voteThread, [req.body.thread_id, req.body.username, req.body.rating], function(err, result){
+					console.log(result.rows);
+					console.log('INSERTED INTO RATINGS."THREADRATING"');
+					done();
+					res.json(result.rows);
+				});
+			}
+			else {
+				client.query(updateVote, [req.body.thread_id, req.body.username, req.body.rating], function(err, result){
+					console.log(result.rows);
+					done();
+					res.json(result.rows);
+				});
+			}
 			done();
-			res.json(result.rows);
 		});
 	});
 });
 
-
-// 1 user param: vote (either +1 or -1)
-// successfully update points of the comment
 router.post('/voteComment', function(req, res){
-	var voteComment = 'UPDATE posts.comment SET points = points + $1 WHERE post.comment.id = $2';
 	console.log(req.body);
+	var voteComment = 'INSERT INTO ratings."CommentRating"(comment_id, username, rating) VALUES($1, $2, $3)';
+	var queryFind = 'SELECT username FROM ratings."CommentRating" WHERE comment_id = $1 and username = $2';
+	var updateVote = 'UPDATE ratings."CommentRating" SET rating = $3 WHERE comment_id = $1 and username = $2';
 
 	pool.connect(function(err, client, done){
-		client.query(voteComment, [req.body.vote, req.body.comment_id], function(err, result){
-			console.log(result.rows);
+		client.query(queryFind, [req.body.comment_id, req.body.username], function(err, result){
+			if (result.rows.length === 0) { // user rating not found, so insert new rating
+				client.query(voteComment, [req.body.comment_id, req.body.username, req.body.rating], function(err, result){
+					console.log(result.rows);
+					done();
+					res.json(result.rows);
+				});
+			}
+			else {
+				client.query(updateVote, [req.body.comment_id, req.body.username, req.body.rating], function(err, result){
+					console.log(result.rows);
+					done();
+					res.json(result.rows);
+				});
+			}
 			done();
-			res.json(result.rows);
 		});
 	});
 });
