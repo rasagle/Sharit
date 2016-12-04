@@ -35,9 +35,14 @@ var defaultSub = {
 /* GET home page. */
 router.get('/', function(req, res) {
 	var user = req.query.username;
+	var findAllThreads = 'SELECT * FROM permissions.subdomain_user natural join posts.thread WHERE username = $1 ORDER BY points DESC, date_posted DESC';
 	if(user){
-		console.log(user);	
-		res.render('initial', {nav: req.session[user].nav, subnav: req.session[user].subnav, logged: false, user: user});
+		pool.connect(function(err, client, done){
+			client.query(findAllThreads, [user], function(err, result){
+				console.log(result);
+				res.render('initial', {nav: req.session[user].nav, subnav: req.session[user].subnav, logged: false, user: user, threads: result.rows});
+			});
+		});
 	}else{
 		res.render('initial', {logged: true});
 	}
