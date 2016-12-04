@@ -2,9 +2,9 @@
 	<div class="col-md-6 col-md-offset-3">
 		<div class="jumbotron">
 			<div class="votes">
-				<button><img src="/images/up.png" class="voteButts"></button><br>
-				{{thread.points}} <br>
-				<button><img src="/images/down.png" class="voteButts"></button><br>
+				<input type="image" class="upVoteThread voteButts" info="/voteThread/{{user}}/{{thread.id}}/1" src="/images/up.png" /><br>
+				<span>{{thread.points}}</span><br>
+				<input type="image" class="downVoteThread" info="/voteThread/{{user}}/{{thread.id}}/-1" src="/images/down.png" class="voteButts" /><br>
 			</div>
 			<div>
 				<h2>{{thread.title}}<br></h2>
@@ -27,9 +27,9 @@
 	<hr>
 	<div class="comments">
 		<div class="votes">
-			<button><img src="/images/up.png" class="voteButts"></button><br>
-			{{points}} <br>
-			<button><img src="/images/down.png" class="voteButts"></button><br>
+			<input type="image" class="upVoteCom comButts" info="/voteComment/{{../user}}/{{id}}/1" src="/images/up.png" /><br>
+			<span>{{points}}</span><br>
+			<input type="image" class="downVoteCom comButts" info="/voteComment/{{../user}}/{{id}}/-1" src="/images/down.png" /><br>
 		</div>
 		<div class="comment-info">
 			<h3>{{comment}}</h3>

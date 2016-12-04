@@ -137,7 +137,7 @@ router.post('/login', function(req, res){
 });
 
 router.get('/NYU/:sub/:subid/:user', function(req, res){
-	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1';
+	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1 ORDER BY points DESC';
 	pool.connect(function(err, client, done){
 		client.query(findThreads, [req.params.subid], function(err, result){
 			done();
@@ -286,27 +286,25 @@ router.post('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 	});
 });
 
-router.post('/voteThread', function(req, res){
+router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
 	console.log(req.body);
 	var voteThread = 'INSERT INTO ratings."ThreadRating"(thread_id, username, rating) VALUES($1, $2, $3)';
 	var queryFind = 'SELECT username FROM ratings."ThreadRating" WHERE thread_id = $1 and username = $2';
 	var updateVote = 'UPDATE ratings."ThreadRating" SET rating = $3 WHERE thread_id = $1 and username = $2';
 
 	pool.connect(function(err, client, done){
-		client.query(queryFind, [req.body.thread_id, req.body.username], function(err, result){
+		client.query(queryFind, [req.params.thread_id, req.params.user], function(err, result){
 			if (result.rows.length === 0) { // user rating not found, so insert new rating
-				client.query(voteThread, [req.body.thread_id, req.body.username, req.body.rating], function(err, result){
+				client.query(voteThread, [req.params.thread_id, req.params.user, req.params.rating], function(err, result){
 					console.log(result.rows);
 					console.log('INSERTED INTO RATINGS."THREADRATING"');
 					done();
-					res.json(result.rows);
 				});
 			}
 			else {
-				client.query(updateVote, [req.body.thread_id, req.body.username, req.body.rating], function(err, result){
+				client.query(updateVote, [req.params.thread_id, req.params.user, req.params.rating], function(err, result){
 					console.log(result.rows);
 					done();
-					res.json(result.rows);
 				});
 			}
 			done();
@@ -314,26 +312,24 @@ router.post('/voteThread', function(req, res){
 	});
 });
 
-router.post('/voteComment', function(req, res){
+router.get('/voteComment/:user/:comment_id/:rating', function(req, res){
 	console.log(req.body);
 	var voteComment = 'INSERT INTO ratings."CommentRating"(comment_id, username, rating) VALUES($1, $2, $3)';
 	var queryFind = 'SELECT username FROM ratings."CommentRating" WHERE comment_id = $1 and username = $2';
 	var updateVote = 'UPDATE ratings."CommentRating" SET rating = $3 WHERE comment_id = $1 and username = $2';
 
 	pool.connect(function(err, client, done){
-		client.query(queryFind, [req.body.comment_id, req.body.username], function(err, result){
+		client.query(queryFind, [req.params.comment_id, req.params.user], function(err, result){
 			if (result.rows.length === 0) { // user rating not found, so insert new rating
-				client.query(voteComment, [req.body.comment_id, req.body.username, req.body.rating], function(err, result){
+				client.query(voteComment, [req.params.comment_id, req.params.user, req.params.rating], function(err, result){
 					console.log(result.rows);
 					done();
-					res.json(result.rows);
 				});
 			}
 			else {
-				client.query(updateVote, [req.body.comment_id, req.body.username, req.body.rating], function(err, result){
+				client.query(updateVote, [req.params.comment_id, req.params.username, req.params.rating], function(err, result){
 					console.log(result.rows);
 					done();
-					res.json(result.rows);
 				});
 			}
 			done();

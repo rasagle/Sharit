@@ -39,6 +39,23 @@
 	height: 25px;
 }
 
+.comButts{
+	width: 15px;
+	height: 15px;
+}
+
 .comment-info{
 	padding-left: 50px;
+}
+
+.upVoteThread, .downVoteThread{
+	height: 25px;
+	width: 25px;
+	border-radius: 25px;
+}
+
+.upVoteCom, .downVoteCom{
+	height: 15px;
+	width: 15px;
+	border-radius: 25px;
 }
