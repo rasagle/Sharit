@@ -22,6 +22,8 @@ Array.prototype.forEach.call(downVoteThread, function(ele){
 function handleUpCom(evt){
 	var url = evt.srcElement.attributes.info.nodeValue;
 	sendAJAX(url, evt, 'up');
+	console.log("hi");
+	this.style.backgroundColor = "green";
 	/*if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === 'up'){}
 	else{
 		this.setAttribute('voted', 'up');
@@ -34,6 +36,7 @@ function handleUpCom(evt){
 function handleUpThread(evt){
 	var url = evt.srcElement.attributes.info.nodeValue;
 	sendAJAX(url, evt, 'up');
+	this.style.backgroundColor = "green";
 	/*if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === "up"){}
 	else{
 		this.setAttribute('voted', 'up');
@@ -46,6 +49,7 @@ function handleUpThread(evt){
 function handleDownCom(evt){
 	var url = evt.srcElement.attributes.info.nodeValue;
 	sendAJAX(url, evt, 'down');
+	this.style.backgroundColor = "red";
 	/*if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === 'down'){}
 	else{
 		this.setAttribute('voted', 'down');
@@ -58,6 +62,7 @@ function handleDownCom(evt){
 function handleDownThread(evt){
 	var url = evt.srcElement.attributes.info.nodeValue;
 	sendAJAX(url, evt, 'down');
+	this.style.backgroundColor = "red";
 	/*if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === "down"){}
 	else{
 		this.setAttribute('voted', 'down');
