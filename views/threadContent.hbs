@@ -16,6 +16,12 @@
 	</div>
 </div>
 
+<form method="POST" action="/NYU/{{sub}}/{{subid}}/{{user}}/{{thread_id}}">
+	<div class="form-group">
+		<textarea rows="10" cols="50" placeholder="Comment Here" name="comment" required></textarea><br>
+		<input type="submit" class="btn btn-primary" value="Comment" />
+	</div>
+</form>
 
 {{#each comments}}
 	<hr>
@@ -25,7 +31,7 @@
 			{{points}} <br>
 			<button><img src="/images/down.png" class="voteButts"></button><br>
 		</div>
-		<div>
+		<div class="comment-info">
 			<h3>{{comment}}</h3>
 			<h5>By: <u>{{author}}</u> on {{date_posted}}</h5>
 		</div>

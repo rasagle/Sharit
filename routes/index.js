@@ -253,7 +253,7 @@ router.get('/downloadFile/:thread_id', function(req, res){
 	});
 });
 
-
+// reteive all comments, file and thread info
 // 1 user param: thread_id
 // returns all information about thread_id, file name and id (use downloadFile route to get file), comments
 router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
@@ -267,21 +267,21 @@ router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 			client.query(comments, [req.params.thread_id], function(err, comments){
 				client.query(file, [req.params.thread_id], function(err, filename){
 					console.log(comments.rows);
-					res.render('threadContent', {thread: thread.rows[0], comments: comments.rows, filename: filename.rows[0], nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub})
+					res.render('threadContent', {thread: thread.rows[0], comments: comments.rows, filename: filename.rows[0], nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub, thread_id: req.params.thread_id})
 				});	
 			});
 		});
 	});
 });
 
-router.post('/createComment', function(req, res){
+
+// create comment
+router.post('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 	var createComment = 'INSERT into posts.comment(thread_id, author, comment) values($1, $2, $3)';
-	console.log(req.body);
 	pool.connect(function(err, client, done){
-		client.query(createComment, [req.body.thread_id, req.body.username, req.body.comment], function(err, result){
-			console.log(result.rows);
+		client.query(createComment, [req.params.thread_id, req.params.user, req.body.comment], function(err, result){
 			done();
-			res.json(result.rows);
+			res.redirect('/NYU/' + req.params.sub + '/' + req.params.subid + '/' + req.params.user + '/' + req.params.thread_id);
 		});
 	});
 });
