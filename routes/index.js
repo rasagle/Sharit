@@ -259,7 +259,7 @@ router.get('/downloadFile/:thread_id', function(req, res){
 router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 	var user = req.params.user;
 	var threads = 'SELECT * FROM posts.thread WHERE id = $1';
-	var comments = 'SELECT * FROM posts.comment WHERE thread_id = $1';
+	var comments = 'SELECT * FROM posts.comment WHERE thread_id=$1 ORDER BY points DESC, date_posted DESC';
 	var file = 'SELECT filename FROM posts.thread JOIN posts.file ON(thread.id = file.thread_id) WHERE thread_id = $1';
 
 	pool.connect(function(err, client, done){
