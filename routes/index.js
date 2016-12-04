@@ -296,15 +296,14 @@ router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
 		client.query(queryFind, [req.params.thread_id, req.params.user], function(err, result){
 			if (result.rows.length === 0) { // user rating not found, so insert new rating
 				client.query(voteThread, [req.params.thread_id, req.params.user, req.params.rating], function(err, result){
-					console.log(result.rows);
-					console.log('INSERTED INTO RATINGS."THREADRATING"');
 					done();
+					return;
 				});
 			}
 			else {
 				client.query(updateVote, [req.params.thread_id, req.params.user, req.params.rating], function(err, result){
-					console.log(result.rows);
 					done();
+					return; 
 				});
 			}
 			done();
