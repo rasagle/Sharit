@@ -1,7 +1,7 @@
 # Project Sharit
 Sharit Website
 
-*Updated 12/2/2016*
+*Updated 12/4/2016*
 
 http://ec2-52-91-21-93.compute-1.amazonaws.com:3000/
 
@@ -66,7 +66,7 @@ The PostgreSQL should be running, but if it is not or unexpectedly dies, Postgre
 sudo service postgresql restart
 ```
 
-### Running NodeJS
+### Running NodeJS and PM2
 Browse to /Sharit/src and get all npm dependencies:
 ```javascript
 sudo npm install
@@ -81,7 +81,15 @@ sudo npm install pm2 -g
 ```
 And run with:
 ```javascript
-pm2 start app.js
+pm2 start ./bin/www
+```
+To kill process:
+```javascript
+pm2 stop www
+```
+To delete process from PM2:
+```javascript
+pm2 delete www
 ```
 
 ### Using PostgreSQL on CLI
@@ -92,3 +100,26 @@ sudo -u postgres psql
 \c 'database_name' \\ use this database
 'SQL'; \\ perform the SQL.
 SELECT * FROM users.user; \\ show members id, pass(hashed), etc.
+```
+
+### Git Protocols:
+To replace all your local files (including edits) with remote repo:
+```git
+git fetch origin
+git reset --hard origin/master
+git clean -f -d
+```
+To get the latest code updates:
+```git
+git pull
+```
+To push all your local files (if merge conflict commit first then pull and push):
+```git
+git add .
+git commit -a
+git push origin master
+```
+To replace all the remote files using your local files:
+```git
+git push -f origin master
+```
