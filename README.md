@@ -10,7 +10,6 @@ Sharit is a website developed to share information between users of established 
 
 ## Technologies Involved
 * NodeJS
-* React
 * PostgreSQL
 * HTML5
 * CSS3
