@@ -20,48 +20,64 @@ Array.prototype.forEach.call(downVoteThread, function(ele){
 });
 
 function handleUpCom(evt){
-	if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === 'up'){}
+	var url = evt.srcElement.attributes.info.nodeValue;
+	sendAJAX(url, evt, 'up');
+	/*if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === 'up'){}
 	else{
 		this.setAttribute('voted', 'up');
-		var url = evt.srcElement.attributes.info.nodeValue;
+		
 		evt.srcElement.nextSibling.nextSibling.nextSibling.textContent = parseInt(evt.srcElement.nextSibling.nextSibling.nextSibling.textContent) + 1;
 		sendAJAX(url);
-	}
+	}*/
 }
 
 function handleUpThread(evt){
-	if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === "up"){}
+	var url = evt.srcElement.attributes.info.nodeValue;
+	sendAJAX(url, evt, 'up');
+	/*if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === "up"){}
 	else{
 		this.setAttribute('voted', 'up');
 		var url = evt.srcElement.attributes.info.nodeValue;
 		evt.srcElement.nextSibling.nextSibling.nextSibling.textContent = parseInt(evt.srcElement.nextSibling.nextSibling.nextSibling.textContent) + 1;
 		sendAJAX(url);
-	}
+	}*/
 }
 
 function handleDownCom(evt){
-	if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === 'down'){}
+	var url = evt.srcElement.attributes.info.nodeValue;
+	sendAJAX(url, evt, 'down');
+	/*if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === 'down'){}
 	else{
 		this.setAttribute('voted', 'down');
 		var url = evt.srcElement.attributes.info.nodeValue;
 		evt.srcElement.previousSibling.previousSibling.previousSibling.textContent = parseInt(evt.srcElement.previousSibling.previousSibling.previousSibling.textContent) - 1;
 		sendAJAX(url);
-	}
+	}*/
 }
 
 function handleDownThread(evt){
-	if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === "down"){}
+	var url = evt.srcElement.attributes.info.nodeValue;
+	sendAJAX(url, evt, 'down');
+	/*if(evt.srcElement.attributes.voted && evt.srcElement.attributes.voted.nodeValue === "down"){}
 	else{
 		this.setAttribute('voted', 'down');
 		var url = evt.srcElement.attributes.info.nodeValue;
 		evt.srcElement.previousSibling.previousSibling.previousSibling.textContent = parseInt(evt.srcElement.previousSibling.previousSibling.previousSibling.textContent) - 1;
 		sendAJAX(url);
-	}
+	}*/
 }
 
-function sendAJAX(url){
+function sendAJAX(url, evt, direction){
 	var req = new XMLHttpRequest();
 	req.open('GET', url);
+	req.addEventListener('load', function(){
+		var output = JSON.parse(this.responseText);
+		if(direction === 'up'){
+			evt.srcElement.nextSibling.nextSibling.nextSibling.textContent = output.points;
+		}else{
+			evt.srcElement.previousSibling.previousSibling.previousSibling.textContent = output.points;
+		}
+	})
 	console.log('sending to', url);
 	req.send();
 }

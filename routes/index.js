@@ -213,7 +213,7 @@ router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), functi
 				console.log(result.rows);
 				
 				done();
-				res.json(result.rows);
+				res.redirect('/NYU/' + req.params.sub + '/' + req.params.subid + '/' + req.params.user);
 			});
 		}
 		else { // there is file
@@ -286,24 +286,31 @@ router.post('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 	});
 });
 
+function getPoints(client, id, res, done, query){
+	client.query(query, [id], function(err, result){
+		done();
+		console.log(result.rows[0]);
+		res.json(result.rows[0]);
+	})
+}
+
 router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
 	console.log(req.body);
 	var voteThread = 'INSERT INTO ratings."ThreadRating"(thread_id, username, rating) VALUES($1, $2, $3)';
 	var queryFind = 'SELECT username FROM ratings."ThreadRating" WHERE thread_id = $1 and username = $2';
 	var updateVote = 'UPDATE ratings."ThreadRating" SET rating = $3 WHERE thread_id = $1 and username = $2';
+	var findPoints = 'SELECT points FROM posts.thread WHERE id = $1';
 
 	pool.connect(function(err, client, done){
 		client.query(queryFind, [req.params.thread_id, req.params.user], function(err, result){
 			if (result.rows.length === 0) { // user rating not found, so insert new rating
 				client.query(voteThread, [req.params.thread_id, req.params.user, req.params.rating], function(err, result){
-					done();
-					return;
+					getPoints(client, req.params.thread_id, res, done, findPoints);
 				});
 			}
 			else {
 				client.query(updateVote, [req.params.thread_id, req.params.user, req.params.rating], function(err, result){
-					done();
-					return; 
+					getPoints(client, req.params.thread_id, res, done, findPoints);
 				});
 			}
 			done();
@@ -316,19 +323,18 @@ router.get('/voteComment/:user/:comment_id/:rating', function(req, res){
 	var voteComment = 'INSERT INTO ratings."CommentRating"(comment_id, username, rating) VALUES($1, $2, $3)';
 	var queryFind = 'SELECT username FROM ratings."CommentRating" WHERE comment_id = $1 and username = $2';
 	var updateVote = 'UPDATE ratings."CommentRating" SET rating = $3 WHERE comment_id = $1 and username = $2';
+	var findPoints = 'SELECT points FROM posts.comment WHERE id = $1';
 
 	pool.connect(function(err, client, done){
 		client.query(queryFind, [req.params.comment_id, req.params.user], function(err, result){
 			if (result.rows.length === 0) { // user rating not found, so insert new rating
 				client.query(voteComment, [req.params.comment_id, req.params.user, req.params.rating], function(err, result){
-					console.log(result.rows);
-					done();
+					getPoints(client, req.params.comment_id, res, done, findPoints);
 				});
 			}
 			else {
-				client.query(updateVote, [req.params.comment_id, req.params.username, req.params.rating], function(err, result){
-					console.log(result.rows);
-					done();
+				client.query(updateVote, [req.params.comment_id, req.params.user, req.params.rating], function(err, result){
+					getPoints(client, req.params.comment_id, res, done, findPoints);
 				});
 			}
 			done();
