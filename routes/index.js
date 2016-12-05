@@ -131,6 +131,10 @@ router.post('/login', function(req, res){
 });
 
 router.get('/NYU/:sub/:subid/:user', function(req, res){
+	if(! req.session.hasOwnProperty(req.params.user)){
+		res.redirect('/');
+		return;
+	}
 	var findThreads = 'SELECT * from posts.thread WHERE subdomain_id = $1 ORDER BY points DESC';
 	pool.connect(function(err, client, done){
 		client.query(findThreads, [req.params.subid], function(err, result){

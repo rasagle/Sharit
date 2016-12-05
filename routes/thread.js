@@ -16,6 +16,9 @@ var configDB = require('../config/dbconfig.js');
 var pool = new pg.Pool(configDB);
 
 router.get('/NYU/:sub/:subid/:user/createThread', function(req, res){
+	if(! req.session.hasOwnProperty(req.params.user)){
+		res.redirect('/');
+	}
 	var user = req.params.user;
 	res.render('createThread', {nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub});
 });
@@ -24,8 +27,11 @@ router.get('/NYU/:sub/:subid/:user/createThread', function(req, res){
 // creates thread w/ file if attached
 // file uploaded in postgres' default db folder
 router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), function(req, res){
+	if(! req.session.hasOwnProperty(req.params.user)){
+		res.redirect('/');
+		return;
+	}
 	var createThread;
-
 	pool.connect(function(err, client, done){
 		if (!req.file) { // no file
 			createThread = 'INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4)';
@@ -60,6 +66,10 @@ router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), functi
 // 1 user param: thread_id
 // returns all information about thread_id, file name and id (use downloadFile route to get file), comments
 router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
+	if(! req.session.hasOwnProperty(req.params.user)){
+		res.redirect('/');
+		return;
+	}
 	var user = req.params.user;
 	var threads = 'SELECT * FROM posts.thread WHERE id = $1';
 	var comments = 'SELECT * FROM posts.comment WHERE thread_id=$1 ORDER BY points DESC, date_posted DESC';
@@ -84,6 +94,10 @@ function getPoints(client, id, res, done, query){
 }
 
 router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
+	if(! req.session.hasOwnProperty(req.params.user)){
+		res.redirect('/');
+		return;
+	}
 	var voteThread = 'INSERT INTO ratings."ThreadRating"(thread_id, username, rating) VALUES($1, $2, $3)';
 	var queryFind = 'SELECT username FROM ratings."ThreadRating" WHERE thread_id = $1 and username = $2';
 	var updateVote = 'UPDATE ratings."ThreadRating" SET rating = $3 WHERE thread_id = $1 and username = $2';
@@ -107,6 +121,10 @@ router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
 });
 
 router.get('/downloadFile/:thread_id', function(req, res){
+	if(! req.session.hasOwnProperty(req.params.user)){
+		res.redirect('/');
+		return;
+	}
 	var downloadFile = 'SELECT filename, data FROM posts.file WHERE thread_id = $1';
 
 	pool.connect(function(err, client, done){

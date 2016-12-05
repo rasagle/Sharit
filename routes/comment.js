@@ -8,6 +8,10 @@ var pool = new pg.Pool(configDB);
 
 // create comment
 router.post('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
+	if(! req.session.hasOwnProperty(req.params.user)){
+		res.redirect('/');
+		return;
+	}
 	var createComment = 'INSERT into posts.comment(thread_id, author, comment) values($1, $2, $3)';
 	pool.connect(function(err, client, done){
 		client.query(createComment, [req.params.thread_id, req.params.user, req.body.comment], function(err, result){
@@ -25,6 +29,10 @@ function getPoints(client, id, res, done, query){
 }
 
 router.get('/voteComment/:user/:comment_id/:rating', function(req, res){
+	if(! req.session.hasOwnProperty(req.params.user)){
+		res.redirect('/');
+		return;
+	}
 	var voteComment = 'INSERT INTO ratings."CommentRating"(comment_id, username, rating) VALUES($1, $2, $3)';
 	var queryFind = 'SELECT username FROM ratings."CommentRating" WHERE comment_id = $1 and username = $2';
 	var updateVote = 'UPDATE ratings."CommentRating" SET rating = $3 WHERE comment_id = $1 and username = $2';
