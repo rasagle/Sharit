@@ -3,7 +3,7 @@ Sharit Website
 
 *Updated 12/4/2016*
 
-http://ec2-52-91-21-93.compute-1.amazonaws.com:3000/
+http://ec2-52-91-21-93.compute-1.amazonaws.com
 
 ## Overview
 Sharit is a website developed to share information between users of established organizations. Main features supported are file sharing with threads, comments for users to communicate with one another. This website is built on NodeJS for front and back end, postgreSQL for db, and React.js + bootstrapping for frontend responsiveness.
@@ -21,13 +21,13 @@ Files will be shared through threads.
 ## How to Install and Run
 ### Installing NodeJS
 On Ubuntu 16.04 LTS, download NodeJS and npm. Commands to do so:
-```javascript
+```git
 sudo apt-get update
 sudo apt-get install nodejs
 sudo apt-get install npm
 ```
 To update node:
-```javascript
+```git
 sudo npm cache clean -f
 sudo npm install -g n
 sudo n stable
@@ -36,68 +36,69 @@ sudo n latest
 
 ### Installing and Running PostgreSQL
 Download PostgreSQL with the following commands:
-```javascript
+```git
 sudo apt-get update
 sudo apt-get install postgresql postgresql-contrib
 ```
 Change user "postgres" password to "root"
-```javascript
+```git
 sudo -u postgres psql
 \password postgres \\ confirm "root"
 \q
 ```
 Create initial empty sharit database:
-```javascript
+```git
 sudo psql -h 'localhost' -p 5432 -U postgres -c "CREATE DATABASE sharit"
 ```
 Verify sharit database has been created (if anything goes wrong, can do "DROP DATABASE sharit;" on psql cli:
-```javascript
+```git
 sudo -u postgres psql
 \l \\ show databases under user "postgres"
 \q
 ```
 Restore sharit.backup database into initial empty sharit we created earlier (watch for path):
-```javascript
+```git
 sudo pg_restore --host 'localhost' --port 5432 --username "postgres" --dbname "sharit" --clean "/home/ubuntu/GitHub/Sharit/databaseFiles/sharit.backup"
 ```
 The PostgreSQL should be running, but if it is not or unexpectedly dies, PostgreSQL service can be restarted:
-```javascript
+```git
 sudo service postgresql restart
 ```
 
 ### Running NodeJS and PM2
 Browse to /Sharit/src and get all npm dependencies:
-```javascript
+```git
 sudo npm install
 ```
 Run the server directly by the following command:
-```javascript
+```git
 node bin/www
 ```
 The server can be automatically restarted upon crash with a production manager module, pm2. Install pm2 by:
-```javascript
+```git
 sudo npm install pm2 -g
 ```
 And run with:
-```javascript
+```git
 pm2 start ./bin/www
 ```
 To kill process:
-```javascript
+```git
 pm2 stop www
 ```
 To delete process from PM2:
-```javascript
+```git
 pm2 delete www
 ```
 
 ### Using PostgreSQL on CLI
-```javascript
+```git
 sudo -u postgres psql
 \l \\ show databases
 \q \\ quit
-\c 'database_name' \\ use this database
-'SQL'; \\ perform the SQL.
+\c sharit \\ use this database
+DROP DATABASE sharit; \\ perform the SQL.
+CREATE DATABASE sharit; \\ perform the SQL.
 SELECT * FROM users.user; \\ show members id, pass(hashed), etc.
 ```
 
