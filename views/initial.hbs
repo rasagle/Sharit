@@ -13,7 +13,17 @@
 {{else}}
 
 <a href="/NYU/{{user}}/createSub"><button class="btn btn-success">Create Subdomain</button></a>
-<a href="/logout/{{user}}"><button class="btn btn-danger">Logout</button></a>
+<a href="/logout/{{user}}"><button class="btn btn-danger">Logout</button></a><br><br>
+<div class="dropdown">
+	<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Join Subdomain
+		<span class="caret"></span></button>
+		<ul class="dropdown-menu">
+			{{#each subs}}
+				<li><a href="/joinSub/{{id}}/{{../user}}">{{name}}</a></li>
+			{{/each}}
+		</ul>
+	</div>
+</div>
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
 		{{#each threads}}

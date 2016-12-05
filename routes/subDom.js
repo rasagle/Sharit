@@ -34,5 +34,18 @@ router.post('/NYU/:user/createSub', function(req, res){
 	});
 });
 
+router.get('/joinSub/:subid/:user', function(req, res){
+	var insertSub = 'insert into permissions.subdomain_user values($1, $2, false);';
+	var findsubDomains = 'SELECT name, id from permissions.subdomain_user as perm JOIN domains.subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = $1';
+	pool.connect(function(err, client, done){
+		client.query(insertSub, [req.params.subid, req.params.user], function(err, result){
+			client.query(findsubDomains, [req.params.user], function(err, result){
+				done();
+				req.session[req.params.user].subnav = result.rows;
+				res.redirect('/?username=' + req.params.user);
+			});
+		});
+	});
+});
 
 module.exports = router;
