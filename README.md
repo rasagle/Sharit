@@ -1,9 +1,11 @@
 # Project Sharit
 Sharit Website
 
-*Updated 12/4/2016*
+*Updated 12/5/2016*
 
 http://ec2-52-91-21-93.compute-1.amazonaws.com
+
+52.91.21.93
 
 ## Overview
 Sharit is a website developed to share information between users of established organizations. Main features supported are file sharing with threads, comments for users to communicate with one another. This website is built on NodeJS for front and back end, postgreSQL for db, and React.js + bootstrapping for frontend responsiveness.
