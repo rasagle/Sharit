@@ -70,17 +70,14 @@ router.post('/register', function(req, res){
 
 		client.query(queryFind, [username], function(err, result){
 			if(err){
-				console.log('Error running query', err);
 				return res.render('error', {error: err})
 			}
 			if(result.rows.length === 0){
 				client.query(queryInsert, [username, hash, first_name, last_name, email, phone, company, salt], function(err, result){
 					done();
 					if(err){
-						console.log('Error running query', err);
 						return res.render('error', {error: err})
 					}
-					console.log(result.rows);
 					res.redirect('/');
 					client.query(domainInsert, [1, username, false], function(err, result){
 						if(err) console.log('Error running query', err);
@@ -103,7 +100,6 @@ router.post('/login', function(req, res){
 	var validLogin = 'SELECT * FROM users.user WHERE username=$1 and hash=$2';
 	var findDomains = 'SELECT name, id from permissions.domain_user NATURAL JOIN domains.domain WHERE username = $1';
 	var findsubDomains = 'SELECT name, id from permissions.subdomain_user as perm JOIN domains.subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = $1';
-	console.log(req.body);
 	pool.connect(function(err, client, done){
 		if(err){
 			console.log('Error running query', err);
@@ -149,7 +145,6 @@ router.get('/NYU/:sub/:subid/:user', function(req, res){
 		client.query(findThreads, [req.params.subid], function(err, result){
 			done();
 			var user = req.params.user;
-			console.log(user);
 			res.render('index', {threads: result.rows, nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub});
 		});
 	});
@@ -159,12 +154,10 @@ router.get('/NYU/:sub/:subid/:user', function(req, res){
 // successfully updates password w/ new hash
 router.post('/updatePassword', function(req, res){
 	var updatePassword = 'UPDATE users.user SET password = $1 WHERE username = $2';
-	console.log(req.body);
 	var salt =  bcrypt.genSaltSync(10);
 	var hash = bcrypt.hashSync(req.body.newPassword, salt);
 	pool.connect(function(err, client, done){
 		client.query(updatePassword, [hash, req.body.username], function(err, result){
-			console.log(result.rows);
 			done();
 			res.json(result.rows);
 		});
@@ -175,10 +168,8 @@ router.post('/updatePassword', function(req, res){
 // returns all domains user is a subscriber of
 router.post('/getDomain', function(req, res){
 	var findDomains = 'SELECT name, id from permissions.domain_user NATURAL JOIN domains.domain WHERE username = $1';
-	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(findDomains, [req.body.username], function(err, result){
-			console.log(result.rows);
 			done();
 			res.json(result.rows);
 		});
@@ -189,10 +180,8 @@ router.post('/getDomain', function(req, res){
 // returns all subdomains user is a subscriber of
 router.post('/getsubDomain', function(req, res){
 	var findsubDomains = 'SELECT name, id from permissions.subdomain_user as perm JOIN domains.subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = $1';
-	console.log(req.body);
 	pool.connect(function(err, client, done){
 		client.query(findsubDomains, [req.body.username], function(err, result){
-			console.log(result.rows);
 			done();
 			res.json(result.rows);
 		});
@@ -209,7 +198,6 @@ router.get('/NYU/:sub/:subid/:user/createThread', function(req, res){
 // file uploaded in postgres' default db folder
 router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), function(req, res){
 	var createThread;
-	console.log(req.body);
 
 	pool.connect(function(err, client, done){
 		if (!req.file) { // no file
@@ -217,14 +205,12 @@ router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), functi
 			
 			client.query(createThread, [req.params.subid, req.body.title, req.params.user, req.body.context], function(err, result){
 				if (err) console.log(err);
-				console.log(result.rows);
 				
 				done();
 				res.redirect('/NYU/' + req.params.sub + '/' + req.params.subid + '/' + req.params.user);
 			});
 		}
 		else { // there is file
-			console.log(req.file);
 			if (err) console.log(err);
 			createThread = 'WITH created_thread_id AS ' + 
 			'(INSERT INTO posts.thread(subdomain_id, title, author, context) ' + 
@@ -235,7 +221,6 @@ router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), functi
 			
 			client.query(createThread, [req.params.subid, req.body.title, req.params.user, req.body.context, req.file.originalname, req.file.filename], function(err, result){
 				if (err) console.log(err);
-				console.log(result.rows);
 					
 				done();
 				res.redirect('/NYU/' + req.params.sub + '/' + req.params.subid + '/' + req.params.user);
@@ -244,12 +229,33 @@ router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), functi
 	});
 });
 
+router.get('/NYU/:user/createSub', function(req, res){
+	var user = req.params.user;
+	res.render('createSub', {user: user})
+})
+
+router.post('/NYU/:user/createSub', function(req, res){
+	var createSub = 'INSERT INTO domains.subdomain (name, domain_id) VALUES($1, 1) RETURNING id';
+	var userSub = 'INSERT INTO permissions.subdomain_user VALUES($1, $2, true)';
+	var findsubDomains = 'SELECT name, id from permissions.subdomain_user as perm JOIN domains.subdomain as dom ON(perm.subdomain_id = dom.id) WHERE username = $1';
+	pool.connect(function(err, client, done){
+		client.query(createSub, [req.body.subName], function(err, result){
+			client.query(userSub, [result.rows[0].id, req.params.user], function(err, result){
+				client.query(findsubDomains, [req.params.user], function(err, result){
+					done();
+					req.session[req.params.user].subnav = result.rows;
+					res.redirect('/?username=' + req.params.user);
+				})
+			});
+		})
+	});
+});
+
 router.get('/downloadFile/:thread_id', function(req, res){
 	var downloadFile = 'SELECT filename, data FROM posts.file WHERE thread_id = $1';
 
 	pool.connect(function(err, client, done){
 		client.query(downloadFile, [req.params.thread_id], function(err, result){
-			// console.log(result.rows); // massive wall of text
 			done();
 			var filename = result.rows[0].filename;
     		var data = result.rows[0].data;
@@ -273,7 +279,6 @@ router.get('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 		client.query(threads, [req.params.thread_id], function(err, thread){
 			client.query(comments, [req.params.thread_id], function(err, comments){
 				client.query(file, [req.params.thread_id], function(err, filename){
-					console.log(comments.rows);
 					res.render('threadContent', {thread: thread.rows[0], comments: comments.rows, filename: filename.rows[0], nav: req.session[user].nav, subnav: req.session[user].subnav, user: user, subid: req.params.subid, sub: req.params.sub, thread_id: req.params.thread_id})
 				});	
 			});
@@ -296,13 +301,11 @@ router.post('/NYU/:sub/:subid/:user/:thread_id', function(req, res){
 function getPoints(client, id, res, done, query){
 	client.query(query, [id], function(err, result){
 		done();
-		console.log(result.rows[0]);
 		res.json(result.rows[0]);
 	})
 }
 
 router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
-	console.log(req.body);
 	var voteThread = 'INSERT INTO ratings."ThreadRating"(thread_id, username, rating) VALUES($1, $2, $3)';
 	var queryFind = 'SELECT username FROM ratings."ThreadRating" WHERE thread_id = $1 and username = $2';
 	var updateVote = 'UPDATE ratings."ThreadRating" SET rating = $3 WHERE thread_id = $1 and username = $2';
@@ -326,7 +329,6 @@ router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
 });
 
 router.get('/voteComment/:user/:comment_id/:rating', function(req, res){
-	console.log(req.body);
 	var voteComment = 'INSERT INTO ratings."CommentRating"(comment_id, username, rating) VALUES($1, $2, $3)';
 	var queryFind = 'SELECT username FROM ratings."CommentRating" WHERE comment_id = $1 and username = $2';
 	var updateVote = 'UPDATE ratings."CommentRating" SET rating = $3 WHERE comment_id = $1 and username = $2';
