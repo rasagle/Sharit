@@ -155,6 +155,11 @@ router.post('/updatePassword', function(req, res){
 	});
 });
 
+router.get('/logout/:user', function(req, res){
+	delete req.session[req.params.user];
+	res.redirect('/');
+});
+
 
 // Not done
 // return top 10 threads of each subdomain user is in
