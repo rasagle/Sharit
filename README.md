@@ -101,6 +101,34 @@ sudo -u postgres psql
 SELECT * FROM users.user; \\ show members id, pass(hashed), etc.
 ```
 
+### Nginx Configuration:
+To install nginx:
+```git
+sudo apt-get update
+sudo apt-get install nginx
+sudo ufw allow 'Nginx HTTP'
+```
+To update nginx (using our nginx.conf file):
+```git
+cd /etc/nginx
+sudo vi nginx.conf (manually)
+```
+or:
+```git
+sudo cp -f /home/ubuntu/GitHub/Sharit/nginx/nginx.conf /etc/nginx
+```
+To check run/restart/status/stop nginx:
+```git
+sudo service start nginx
+sudo service restart nginx
+sudo service stop nginx
+sudo service status nginx
+```
+To check for debug errors running nginx server (due to misconfiguration):
+```git
+sudo nginx -t -c /etc/nginx/nginx.conf
+```
+
 ### Git Protocols:
 To replace all your local files (including edits) with remote repo:
 ```git
