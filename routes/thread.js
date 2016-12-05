@@ -121,10 +121,6 @@ router.get('/voteThread/:user/:thread_id/:rating', function(req, res){
 });
 
 router.get('/downloadFile/:thread_id', function(req, res){
-	if(! req.session.hasOwnProperty(req.params.user)){
-		res.redirect('/');
-		return;
-	}
 	var downloadFile = 'SELECT filename, data FROM posts.file WHERE thread_id = $1';
 
 	pool.connect(function(err, client, done){
