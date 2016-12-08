@@ -7,13 +7,6 @@ http://ec2-52-91-21-93.compute-1.amazonaws.com
 
 52.91.21.93
 
-## Post-Development
-After restoring sharit.backup, run these queries:
-```git
-ALTER TABLE posts.file ALTER COLUMN data DROP NOT NULL;
-ALTER TABLE posts.file ALTER COLUMN filename DROP NOT NULL;
-```
-
 ## Overview
 Sharit is a website developed to share information between users of established organizations. Main features supported are file sharing with threads, comments for users to communicate with one another. This website is built on NodeJS for front and back end, postgreSQL for db, and React.js + bootstrapping for frontend responsiveness.
 
@@ -58,6 +51,8 @@ sudo -u postgres psql
 Create initial empty sharit database:
 ```git
 sudo psql -h 'localhost' -p 5432 -U postgres -c "CREATE DATABASE sharit"
+OR
+CREATE DATABASE sharit;
 ```
 Verify sharit database has been created (if anything goes wrong, can do "DROP DATABASE sharit;" on psql cli:
 ```git
@@ -121,7 +116,7 @@ sudo ufw allow 'Nginx HTTP'
 To update nginx (using our nginx.conf file):
 ```git
 cd /etc/nginx
-sudo vi nginx.conf (manually)
+sudo vi nginx.conf \\ manually
 ```
 or:
 ```git
