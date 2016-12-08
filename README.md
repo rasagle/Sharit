@@ -1,11 +1,18 @@
 # Project Sharit
 Sharit Website
 
-*Updated 12/5/2016*
+*Updated 12/7/2016*
 
 http://ec2-52-91-21-93.compute-1.amazonaws.com
 
 52.91.21.93
+
+## Post-Development
+After restoring sharit.backup, run these queries:
+```git
+ALTER TABLE posts.file ALTER COLUMN data DROP NOT NULL;
+ALTER TABLE posts.file ALTER COLUMN filename DROP NOT NULL;
+```
 
 ## Overview
 Sharit is a website developed to share information between users of established organizations. Main features supported are file sharing with threads, comments for users to communicate with one another. This website is built on NodeJS for front and back end, postgreSQL for db, and React.js + bootstrapping for frontend responsiveness.
@@ -60,7 +67,7 @@ sudo -u postgres psql
 ```
 Restore sharit.backup database into initial empty sharit we created earlier (watch for path):
 ```git
-sudo pg_restore --host 'localhost' --port 5432 --username "postgres" --dbname "sharit" --clean "/home/ubuntu/GitHub/Sharit/databaseFiles/sharit.backup"
+sudo pg_restore --host 'localhost' --port 5432 --username "postgres" --dbname "sharit" --clean "/home/ubuntu/GitHub/Sharit/database/sharit.backup"
 ```
 The PostgreSQL should be running, but if it is not or unexpectedly dies, PostgreSQL service can be restarted:
 ```git

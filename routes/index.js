@@ -26,8 +26,8 @@ var defaultSub = {
 /* GET home page. */
 router.get('/', function(req, res) {
 	var user = req.query.username;
-	var findAllThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name ' +
-	'FROM (permissions.subdomain_user natural join posts.thread) join domains.subdomain on(thread.subdomain_id = subdomain.id) WHERE username = $1 ORDER BY points DESC, date_posted DESC';
+	var findAllThreads = 'SELECT subdomain_id, username, thread.id, author, date_posted, title, context, points, name, filename ' +
+	'FROM (permissions.subdomain_user natural join posts.thread natural join posts.file) join domains.subdomain on(thread.subdomain_id = subdomain.id) WHERE username = $1 ORDER BY points DESC, date_posted DESC';
 	var findSubUserNotIn = 'select id, name from domains.subdomain where id not in'+
 '		(select subdomain_id from permissions.subdomain_user where username=$1) order by name;';
 	if(user){

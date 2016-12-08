@@ -34,12 +34,7 @@ router.post('/NYU/:sub/:subid/:user/createThread', upload.single('file'), functi
 	var createThread;
 	pool.connect(function(err, client, done){
 		if (!req.file) { // no file
-			createThread = 'WITH created_thread_id AS ' + 
-			'(INSERT INTO posts.thread(subdomain_id, title, author, context) ' + 
-			'VALUES($1, $2, $3, $4) ' + 'RETURNING id) ' + 
-			'INSERT INTO posts.file(thread_id) ' + 
-			'SELECT id' + 
-			'FROM created_thread_id';
+			createThread = 'WITH created_thread_id AS (INSERT INTO posts.thread(subdomain_id, title, author, context) VALUES($1, $2, $3, $4) RETURNING id) INSERT INTO posts.file(thread_id) SELECT id FROM created_thread_id';
 
 			client.query(createThread, [req.params.subid, req.body.title, req.params.user, req.body.context], function(err, result){
 				if (err) console.log(err);
