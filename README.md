@@ -1,11 +1,10 @@
 # Project Sharit
 Sharit Website
 
-*Updated 12/7/2016*
+*Updated 6/3/2017*
 
-http://ec2-52-91-21-93.compute-1.amazonaws.com
-
-52.91.21.93
+# WEBSITE IS SHUT DOWN
+Hosting the web app exceeded my AWS credits and actually costed me quite a fortune :(
 
 ## Overview
 Sharit is a website developed to share information between users of established organizations. Main features supported are file sharing with threads, comments for users to communicate with one another. This website is built on NodeJS for front and back end, postgreSQL for db, and templating + jQuery bootstrapping for frontend responsiveness.
